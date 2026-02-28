@@ -1,0 +1,3334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="meta.title">BizForge — AI Brand Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --bg: #080810;
+      --card: #0f0f1a;
+      --card2: #13132a;
+      --border: rgba(255,255,255,0.07);
+      --accent: #7c3aed;
+      --accent2: #3b82f6;
+      --accent3: #10b981;
+      --text: #f0f0f0;
+      --muted: rgba(255,255,255,0.4);
+      --nav-bg: rgba(8,8,16,0.88);
+      --error: #ef4444;
+      --success: #10b981;
+    }
+    body.light-mode {
+      --bg: #f5f5f8;
+      --card: #ffffff;
+      --card2: #f0eefe;
+      --border: rgba(0,0,0,0.09);
+      --text: #1a1a2e;
+      --muted: rgba(0,0,0,0.45);
+      --nav-bg: rgba(245,245,248,0.92);
+    }
+
+    body {
+      background: var(--bg);
+      background-image: linear-gradient(135deg, var(--bg) 0%, #0d0824 50%, #060d1a 100%);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    body.light-mode {
+      background-image: linear-gradient(135deg, #f5f5f8 0%, #ede8f8 50%, #e8f0fe 100%);
+    }
+
+    /* Grid overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none; z-index: 0;
+    }
+    body.light-mode::before {
+      background-image:
+        linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+    }
+
+    /* Blobs */
+    .blob {
+      position: fixed; border-radius: 50%;
+      filter: blur(80px); opacity: 0.12;
+      animation: blobFloat 14s ease-in-out infinite alternate;
+      pointer-events: none; z-index: 0;
+    }
+    .blob-1 { width:700px;height:700px; background:radial-gradient(circle,#7c3aed,transparent 70%); top:-200px; right:-200px; }
+    .blob-2 { width:500px;height:500px; background:radial-gradient(circle,#3b82f6,transparent 70%); bottom:-150px; left:-150px; animation-delay:-7s; animation-duration:18s; }
+    @keyframes blobFloat { from{transform:translate(0,0) scale(1);} to{transform:translate(30px,-50px) scale(1.08);} }
+
+    /* ────── NAV ────── */
+    nav {
+      position: fixed; top:0; left:0; right:0; z-index:200;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 40px;
+      background: var(--nav-bg);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand {
+      font-family:'Bebas Neue',cursive; font-size:1.45rem; letter-spacing:5px;
+      background: linear-gradient(135deg,#a78bfa,#60a5fa);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      text-decoration:none; cursor:pointer;
+    }
+    .nav-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    #nav-username { color:var(--accent); font-weight:700; font-size:0.88rem; }
+    .nav-step {
+      font-size:0.68rem; letter-spacing:0.18em; text-transform:uppercase;
+      color:var(--muted); background:rgba(255,255,255,0.04);
+      border:1px solid var(--border); padding:5px 12px; border-radius:99px;
+    }
+    .lang-selector {
+      background:rgba(255,255,255,0.05); border:1px solid var(--border);
+      border-radius:8px; color:var(--muted); padding:6px 10px;
+      font-family:'DM Sans',sans-serif; font-size:0.78rem; cursor:pointer; outline:none;
+    }
+    body.light-mode .lang-selector { background:rgba(0,0,0,0.05); }
+    .theme-toggle {
+      background:rgba(255,255,255,0.05); border:1px solid var(--border);
+      border-radius:8px; padding:6px 10px; cursor:pointer; font-size:1rem;
+      transition:all 0.2s; color:var(--text);
+    }
+    .theme-toggle:hover { background:rgba(124,58,237,0.15); border-color:var(--accent); }
+    .btn-logout {
+      padding:6px 14px; background:transparent;
+      border:1px solid rgba(239,68,68,0.3); border-radius:8px;
+      color:#fca5a5; font-family:'DM Sans',sans-serif; font-size:0.78rem;
+      cursor:pointer; transition:all 0.2s;
+    }
+    .btn-logout:hover { background:rgba(239,68,68,0.1); }
+
+    /* ────── PAGE SYSTEM ────── */
+    .page { display:none; }
+    .page.active { display:block; }
+
+    /* ────── LANDING ────── */
+    #page-landing { padding-top:70px; position:relative; z-index:1; }
+
+    .hero { text-align:center; padding:90px 24px 60px; }
+
+    .hero-eyebrow {
+      display:inline-flex; align-items:center; gap:8px;
+      font-size:0.7rem; letter-spacing:0.32em; text-transform:uppercase;
+      color:var(--accent); background:rgba(124,58,237,0.1);
+      border:1px solid rgba(124,58,237,0.25); padding:7px 18px;
+      border-radius:99px; margin-bottom:28px;
+    }
+    .hero h1 {
+      font-family:'Bebas Neue',cursive;
+      font-size:clamp(3.5rem,9vw,7.5rem);
+      line-height:0.93; letter-spacing:2px; margin-bottom:22px;
+    }
+    .gradient-text {
+      background:linear-gradient(135deg,#a78bfa,#60a5fa,#34d399);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .hero-sub {
+      font-size:1.08rem; color:var(--muted);
+      max-width:540px; margin:0 auto 36px; line-height:1.75;
+    }
+    .hero-cta-group { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+    .btn-hero {
+      padding:15px 36px;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border:none; border-radius:14px; color:#fff;
+      font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:700;
+      cursor:pointer; transition:all 0.25s ease; position:relative; overflow:hidden;
+    }
+    .btn-hero::after { content:''; position:absolute; inset:0; background:rgba(255,255,255,0.12); transform:translateX(-101%); transition:transform 0.35s ease; }
+    .btn-hero:hover { transform:translateY(-3px); box-shadow:0 18px 52px rgba(124,58,237,0.45); }
+    .btn-hero:hover::after { transform:translateX(0); }
+    .btn-hero-outline {
+      padding:15px 36px; background:transparent;
+      border:1px solid var(--border); border-radius:14px; color:var(--text);
+      font-family:'DM Sans',sans-serif; font-size:1rem; cursor:pointer; transition:all 0.2s;
+    }
+    .btn-hero-outline:hover { border-color:rgba(124,58,237,0.5); background:rgba(124,58,237,0.07); }
+
+    /* Stats row */
+    .hero-stats { display:flex; justify-content:center; gap:40px; margin-top:52px; flex-wrap:wrap; }
+    .stat-item { text-align:center; }
+    .stat-num { font-family:'Bebas Neue',cursive; font-size:2.4rem; letter-spacing:2px; background:linear-gradient(135deg,#a78bfa,#60a5fa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .stat-label { font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.15em; margin-top:2px; }
+
+    /* Marquee */
+    .marquee-wrap { overflow:hidden; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:14px 0; margin-bottom:0; }
+    .marquee-track { display:flex; width:max-content; animation:marquee 30s linear infinite; }
+    .marquee-item { white-space:nowrap; font-size:0.78rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--muted); padding:0 32px; }
+    .marquee-dot { color:var(--accent); }
+    @keyframes marquee { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+
+    /* Feature cards */
+    .features-section { max-width:1100px; margin:0 auto; padding:64px 24px 80px; }
+    .section-label { text-align:center; font-size:0.7rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--accent); margin-bottom:14px; }
+    .section-title { font-family:'Bebas Neue',cursive; font-size:clamp(2rem,4vw,3.2rem); text-align:center; letter-spacing:1px; margin-bottom:44px; }
+    .section-title em { font-family:'Instrument Serif',serif; font-style:italic; background:linear-gradient(135deg,#a78bfa,#60a5fa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+
+    .features-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:18px; }
+    .feature-card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:20px; padding:28px; transition:all 0.3s ease;
+      position:relative; overflow:hidden;
+    }
+    .feature-card::before {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(135deg,var(--accent),transparent 60%);
+      opacity:0; transition:opacity 0.3s ease;
+    }
+    .feature-card:hover { border-color:rgba(124,58,237,0.45); transform:translateY(-6px); box-shadow:0 20px 52px rgba(124,58,237,0.14); }
+    .feature-card:hover::before { opacity:0.06; }
+    .feature-card > * { position:relative; z-index:1; }
+    .feature-icon { font-size:2.2rem; margin-bottom:16px; display:block; }
+    .feature-num { font-family:'Bebas Neue',cursive; font-size:4.5rem; line-height:1; opacity:0.05; position:absolute; top:-8px; right:16px; color:var(--accent); pointer-events:none; }
+    .feature-name { font-family:'Bebas Neue',cursive; font-size:1.28rem; letter-spacing:1px; margin-bottom:9px; }
+    .feature-desc { font-size:0.86rem; color:var(--muted); line-height:1.65; }
+
+    /* Info / Why section */
+    .info-section {
+      background:rgba(255,255,255,0.022); border:1px solid var(--border);
+      border-radius:24px; padding:56px 48px;
+      max-width:1100px; margin:0 auto 80px;
+    }
+    body.light-mode .info-section { background:rgba(255,255,255,0.8); }
+    .info-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:16px; margin-top:40px; }
+    .info-tile {
+      background:rgba(124,58,237,0.06); border:1px solid rgba(124,58,237,0.15);
+      border-radius:14px; padding:20px; display:flex; align-items:flex-start; gap:14px;
+      transition:all 0.25s ease;
+    }
+    .info-tile:hover { border-color:rgba(124,58,237,0.35); transform:translateY(-3px); }
+    .info-tile-icon { font-size:1.5rem; flex-shrink:0; }
+    .info-tile-label { font-weight:700; color:var(--text); margin-bottom:5px; font-size:0.88rem; }
+    .info-tile-text { font-size:0.8rem; color:var(--muted); line-height:1.55; }
+
+    /* Footer */
+    .site-footer { border-top:1px solid var(--border); padding:32px 40px; text-align:center; color:var(--muted); font-size:0.82rem; }
+    .site-footer strong { color:var(--text); }
+    .site-footer .model-credits { margin-top:6px; opacity:0.5; font-size:0.73rem; }
+
+    /* ────── APP PAGE ────── */
+    #page-app { padding-top:70px; position:relative; z-index:1; }
+    .app-inner { max-width:1000px; margin:0 auto; padding:30px 24px 80px; }
+    .app-section { display:none; }
+    .app-section.active { display:block; }
+
+    /* Progress */
+    .progress-wrap { margin-bottom:36px; }
+    .progress-label { display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); }
+    .progress-bar { height:3px; background:rgba(255,255,255,0.06); border-radius:99px; overflow:hidden; }
+    .progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); width:0%; transition:width 0.35s ease; }
+
+    /* Page headers */
+    .page-header { margin-bottom:36px; }
+    .eyebrow {
+      font-size:0.68rem; letter-spacing:0.3em; text-transform:uppercase;
+      color:var(--accent); margin-bottom:12px; display:flex; align-items:center; gap:8px;
+    }
+    .eyebrow::before { content:''; width:22px; height:1px; background:var(--accent); }
+    h1 { font-family:'Bebas Neue',cursive; font-size:clamp(2.5rem,5vw,4rem); line-height:1; letter-spacing:1px; margin-bottom:10px; }
+    h1 em { font-family:'Instrument Serif',serif; font-style:italic; background:linear-gradient(135deg,#a78bfa,#60a5fa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .header-subtitle { color:var(--muted); font-size:0.93rem; line-height:1.6; }
+
+    /* Grids */
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-bottom:24px; }
+    .mode-grid { grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
+
+    /* Cards */
+    .card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:16px; padding:24px; cursor:pointer;
+      transition:all 0.22s ease; position:relative; animation:fadeUp 0.5s ease both;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(22px);} to{opacity:1;transform:translateY(0);} }
+    .card:hover { border-color:rgba(124,58,237,0.42); transform:translateY(-4px); box-shadow:0 14px 44px rgba(124,58,237,0.16); }
+    .card.selected { border-color:var(--accent); background:rgba(124,58,237,0.1); box-shadow:0 0 0 2px rgba(124,58,237,0.28); }
+
+    .mode-card { text-align:center; padding:32px 20px; }
+    .mode-icon { font-size:2.6rem; margin-bottom:14px; }
+    .mode-title { font-family:'Bebas Neue',cursive; font-size:1.25rem; letter-spacing:1px; margin-bottom:6px; }
+    .mode-desc { font-size:0.8rem; color:var(--muted); }
+
+    .card-number { font-size:0.65rem; letter-spacing:0.2em; color:var(--muted); margin-bottom:10px; }
+    .card-title { font-family:'Bebas Neue',cursive; font-size:1.8rem; letter-spacing:1px; margin-bottom:8px; word-break:break-word; }
+    .card-text { font-family:'Instrument Serif',serif; font-size:1.15rem; line-height:1.35; }
+    .card-prompt { font-size:0.87rem; color:var(--muted); margin:12px 0; padding:10px 12px; background:rgba(255,255,255,0.025); border-radius:8px; border-left:2px solid var(--accent); }
+
+    .selected-badge {
+      position:absolute; top:14px; right:14px;
+      background:var(--accent); color:#fff; font-size:0.65rem;
+      padding:4px 10px; border-radius:99px;
+      opacity:0; transform:scale(0.8); transition:all 0.2s ease;
+    }
+    .card.selected .selected-badge { opacity:1; transform:scale(1); }
+
+    /* Domain badge on name cards */
+    .domain-badge {
+      display:inline-flex; align-items:center; gap:5px;
+      font-size:0.68rem; padding:3px 9px; border-radius:99px; margin-top:8px;
+      font-weight:600; letter-spacing:0.05em;
+    }
+    .domain-badge.available { background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.4); color:#34d399; }
+    .domain-badge.taken { background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; }
+    .domain-badge.checking { background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--muted); }
+
+    /* Color swatches */
+    .color-swatches { display:flex; gap:8px; margin:14px 0; flex-wrap:wrap; }
+    .swatch { width:42px; height:42px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); transition:transform 0.15s; }
+    .swatch:hover { transform:scale(1.15); }
+    .swatch-small { width:26px; height:26px; border-radius:5px; }
+
+    /* Logo preview */
+    .logo-preview {
+      width:120px; height:120px; margin:0 auto 16px;
+      background:rgba(255,255,255,0.03); border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:2rem; border:1px dashed var(--border); overflow:hidden;
+    }
+    .logo-preview img { max-width:100%; max-height:100%; border-radius:8px; object-fit:contain; }
+
+    /* Buttons */
+    .btn-primary {
+      padding:13px 30px;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border:none; border-radius:12px; color:#fff;
+      font-family:'DM Sans',sans-serif; font-size:0.93rem; font-weight:600;
+      cursor:pointer; transition:all 0.22s ease;
+    }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 12px 40px rgba(124,58,237,0.4); }
+    .btn-primary:disabled { opacity:0.45; pointer-events:none; }
+    .btn-secondary {
+      padding:11px 22px; background:transparent;
+      border:1px solid var(--border); border-radius:12px; color:var(--muted);
+      cursor:pointer; transition:all 0.2s ease; font-family:'DM Sans',sans-serif;
+    }
+    .btn-secondary:hover { border-color:rgba(255,255,255,0.22); color:var(--text); }
+    .btn-success {
+      padding:11px 22px;
+      background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.35);
+      border-radius:12px; color:#34d399; cursor:pointer;
+      font-family:'DM Sans',sans-serif; transition:all 0.2s;
+    }
+    .btn-success:hover { background:rgba(16,185,129,0.25); }
+
+    /* Inputs */
+    input[type="text"], input[type="password"], textarea, select.form-select {
+      width:100%; padding:13px;
+      background:rgba(255,255,255,0.04); border:1px solid var(--border);
+      border-radius:12px; color:var(--text);
+      font-family:'DM Sans',sans-serif; font-size:0.93rem; outline:none;
+      transition:border-color 0.2s;
+    }
+    input[type="text"]:focus, input[type="password"]:focus, textarea:focus, select.form-select:focus { border-color:var(--accent); }
+    body.light-mode input[type="text"], body.light-mode input[type="password"], body.light-mode textarea, body.light-mode select.form-select { background:rgba(0,0,0,0.04); }
+
+    /* Forms */
+    .form-group { margin-bottom:18px; }
+    label { display:block; margin-bottom:7px; font-size:0.86rem; color:var(--muted); font-weight:500; }
+    .char-counter { text-align:right; font-size:0.7rem; color:var(--muted); margin-top:4px; }
+    .option-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:18px; }
+    .option-card {
+      padding:14px 10px; background:rgba(255,255,255,0.03); border:1px solid var(--border);
+      border-radius:12px; text-align:center; cursor:pointer; transition:all 0.2s ease; font-size:0.87rem;
+    }
+    .option-card:hover { border-color:rgba(124,58,237,0.4); background:rgba(124,58,237,0.06); }
+    .option-card.selected { border-color:var(--accent); background:rgba(124,58,237,0.12); color:var(--text); }
+
+    /* Feedback + bottom bars */
+    .feedback-section { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:20px; }
+    .feedback-row { display:flex; gap:12px; align-items:stretch; }
+    .feedback-input { flex:1; }
+    .bottom-bar { display:flex; align-items:center; justify-content:space-between; margin-top:22px; padding-top:22px; border-top:1px solid var(--border); gap:12px; flex-wrap:wrap; }
+    .selected-preview { display:flex; align-items:center; gap:10px; color:var(--muted); font-size:0.9rem; }
+    .preview-value { font-family:'Instrument Serif',serif; font-size:1.1rem; background:linear-gradient(135deg,#a78bfa,#60a5fa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+
+    /* Loading */
+    .loading-state { text-align:center; padding:60px 20px; display:none; }
+    .loading-state.show { display:block; }
+    .spinner { width:50px; height:50px; border:3px solid rgba(124,58,237,0.2); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 20px; }
+    @keyframes spin { to{transform:rotate(360deg);} }
+
+    /* Alert */
+    .alert { padding:12px 16px; border-radius:10px; margin-bottom:20px; display:none; align-items:center; gap:10px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.22); color:#fca5a5; }
+    .alert.show { display:flex; }
+    .alert.success { background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.3); color:#34d399; }
+
+    /* Competitor */
+    .competitor-input { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+    .analysis-results {
+      background:var(--card); border:1px solid var(--border); border-radius:16px;
+      padding:22px; margin-top:20px; font-family:monospace; font-size:0.82rem;
+      line-height:1.65; max-height:520px; overflow-y:auto; white-space:pre-wrap; word-break:break-word;
+    }
+
+    /* Domain checker */
+    .domain-input-row { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+    .domain-results { display:flex; flex-direction:column; gap:10px; margin-top:16px; }
+    .domain-result-item {
+      background:var(--card); border:1px solid var(--border); border-radius:12px;
+      padding:16px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .domain-result-name { font-family:'Bebas Neue',cursive; font-size:1.2rem; letter-spacing:1px; }
+    .domain-result-url { font-size:0.82rem; color:var(--muted); }
+    .domain-status { font-size:0.8rem; font-weight:700; padding:5px 12px; border-radius:99px; }
+    .domain-status.avail { background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); }
+    .domain-status.taken { background:rgba(239,68,68,0.12); color:#fca5a5; border:1px solid rgba(239,68,68,0.25); }
+
+    /* Summary */
+    .summary-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:24px; margin-bottom:22px; }
+    .summary-row { display:flex; padding:12px 0; border-bottom:1px solid var(--border); }
+    .summary-row:last-child { border-bottom:none; }
+    .summary-label { width:130px; color:var(--muted); font-size:0.76rem; text-transform:uppercase; letter-spacing:0.12em; flex-shrink:0; padding-top:2px; }
+    .summary-value { flex:1; word-break:break-word; font-size:0.95rem; }
+
+    .download-options { display:flex; gap:12px; margin-top:22px; flex-wrap:wrap; }
+    .preview-frame { width:100%; height:500px; border:none; border-radius:16px; background:#fff; margin-top:20px; }
+
+    .hidden { display:none !important; }
+
+    /* ────── CHATBOT ────── */
+    #chat-fab {
+      position:fixed; bottom:28px; right:28px; z-index:1000;
+      width:58px; height:58px; border-radius:50%;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border:none; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.5rem; box-shadow:0 8px 36px rgba(124,58,237,0.5);
+      transition:all 0.25s ease;
+    }
+    #chat-fab:hover { transform:scale(1.1); box-shadow:0 14px 52px rgba(124,58,237,0.65); }
+    #chat-fab.open { background:linear-gradient(135deg,#4b5563,#374151); }
+
+    #chat-window {
+      position:fixed; bottom:100px; right:28px; z-index:999;
+      width:370px; background:var(--card); border:1px solid var(--border);
+      border-radius:22px; box-shadow:0 24px 72px rgba(0,0,0,0.55);
+      display:flex; flex-direction:column; overflow:hidden;
+      transform:scale(0.88) translateY(24px); opacity:0; pointer-events:none;
+      transition:all 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    #chat-window.open { transform:scale(1) translateY(0); opacity:1; pointer-events:all; }
+
+    .chat-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:16px 18px; border-bottom:1px solid var(--border);
+      background:rgba(124,58,237,0.08);
+    }
+    .chat-header-left { display:flex; align-items:center; gap:10px; }
+    .chat-avatar {
+      width:34px; height:34px; border-radius:50%;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0;
+    }
+    .chat-header-title { font-family:'Bebas Neue',cursive; font-size:1.08rem; letter-spacing:2px; background:linear-gradient(135deg,#a78bfa,#60a5fa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .chat-header-sub { font-size:0.68rem; color:var(--muted); margin-top:1px; }
+    .chat-online { display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981; box-shadow:0 0 6px #10b981; }
+    .chat-close { background:transparent; border:none; color:var(--muted); font-size:1.2rem; cursor:pointer; padding:3px 7px; border-radius:6px; transition:color 0.15s; }
+    .chat-close:hover { color:var(--text); }
+
+    .chat-messages {
+      overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px;
+      min-height:270px; max-height:360px;
+    }
+    .chat-messages::-webkit-scrollbar { width:4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+    .chat-msg {
+      max-width:84%; padding:10px 14px; border-radius:16px;
+      font-size:0.875rem; line-height:1.58; word-break:break-word;
+    }
+    .chat-msg.bot {
+      align-self:flex-start; background:rgba(124,58,237,0.12);
+      border:1px solid rgba(124,58,237,0.22); border-bottom-left-radius:4px;
+    }
+    .chat-msg.user {
+      align-self:flex-end;
+      background:linear-gradient(135deg,rgba(124,58,237,0.38),rgba(59,130,246,0.28));
+      border:1px solid rgba(124,58,237,0.32); border-bottom-right-radius:4px;
+    }
+    .chat-msg.typing { display:flex; gap:5px; align-items:center; padding:15px 18px; }
+    .chat-msg.typing span { width:7px; height:7px; border-radius:50%; background:var(--accent); animation:typingDot 1.2s ease-in-out infinite; }
+    .chat-msg.typing span:nth-child(2) { animation-delay:0.2s; }
+    .chat-msg.typing span:nth-child(3) { animation-delay:0.4s; }
+    @keyframes typingDot { 0%,60%,100%{opacity:0.25;transform:scale(0.8);} 30%{opacity:1;transform:scale(1);} }
+
+    /* Quick suggestions */
+    .chat-suggestions { display:flex; gap:6px; padding:8px 14px; flex-wrap:wrap; border-top:1px solid var(--border); }
+    .chat-suggest-btn {
+      font-size:0.72rem; padding:5px 11px; border-radius:99px; cursor:pointer;
+      background:rgba(124,58,237,0.1); border:1px solid rgba(124,58,237,0.25); color:var(--muted);
+      transition:all 0.2s; white-space:nowrap;
+    }
+    .chat-suggest-btn:hover { background:rgba(124,58,237,0.2); color:var(--text); }
+
+    .chat-input-row {
+      display:flex; gap:8px; padding:12px 14px; border-top:1px solid var(--border);
+      align-items:center;
+    }
+    .chat-input-row input {
+      flex:1; padding:10px 14px; background:rgba(255,255,255,0.05);
+      border:1px solid var(--border); border-radius:12px; color:var(--text);
+      font-family:'DM Sans',sans-serif; font-size:0.875rem; outline:none; width:auto;
+    }
+    .chat-input-row input:focus { border-color:var(--accent); }
+    .chat-send {
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border:none; border-radius:12px; color:#fff;
+      width:40px; height:40px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.1rem; flex-shrink:0; transition:all 0.2s;
+    }
+    .chat-send:hover { transform:scale(1.07); }
+    .chat-send:disabled { opacity:0.45; pointer-events:none; }
+
+    /* ────── RESPONSIVE ────── */
+    @media (max-width:640px) {
+      nav { padding:12px 16px; }
+      .hero { padding:60px 16px 40px; }
+      .info-section { padding:36px 20px; }
+      #chat-window { width:calc(100vw - 24px); right:12px; }
+      #chat-fab { right:14px; bottom:14px; }
+      .bottom-bar { flex-direction:column; align-items:flex-start; }
+      .hero-stats { gap:24px; }
+    }
+    @media (max-width:480px) {
+      .mode-grid { grid-template-columns:1fr 1fr; }
+    }
+
+    /* ────── MIC BUTTON ────── */
+    .input-mic-wrap { position:relative; display:flex; align-items:center; gap:8px; }
+    .input-mic-wrap > input, .input-mic-wrap > textarea { flex:1; }
+    .mic-btn {
+      flex-shrink:0; width:38px; height:38px; border-radius:10px;
+      background:rgba(124,58,237,0.1); border:1px solid rgba(124,58,237,0.3);
+      color:var(--accent); cursor:pointer; display:flex; align-items:center;
+      justify-content:center; font-size:1rem; transition:all 0.2s; align-self:flex-start;
+    }
+    .mic-btn:hover { background:rgba(124,58,237,0.2); }
+    .mic-btn.recording {
+      background:rgba(239,68,68,0.15); border-color:rgba(239,68,68,0.45); color:#ef4444;
+      animation:micPulse 0.8s ease-in-out infinite alternate;
+    }
+    @keyframes micPulse { from{box-shadow:0 0 0 0 rgba(239,68,68,0.25);} to{box-shadow:0 0 0 8px rgba(239,68,68,0);} }
+    .mic-btn.loading { opacity:0.5; pointer-events:none; }
+    .textarea-mic-wrap { position:relative; }
+    .textarea-mic-wrap textarea { width:100%; }
+    .textarea-mic-btn {
+      position:absolute; bottom:10px; right:10px; width:32px; height:32px; border-radius:8px;
+      background:rgba(124,58,237,0.12); border:1px solid rgba(124,58,237,0.28);
+      color:var(--accent); cursor:pointer; display:flex; align-items:center;
+      justify-content:center; font-size:0.85rem; transition:all 0.2s; z-index:2;
+    }
+    .textarea-mic-btn:hover { background:rgba(124,58,237,0.22); }
+    .textarea-mic-btn.recording { background:rgba(239,68,68,0.15); border-color:rgba(239,68,68,0.45); color:#ef4444; animation:micPulse 0.8s ease-in-out infinite alternate; }
+
+    /* ────── AI TOOL RESULT CARD ────── */
+    .result-box {
+      background:var(--card2); border:1px solid var(--border); border-radius:16px;
+      padding:24px; margin-top:20px; font-size:0.92rem; line-height:1.72;
+      white-space:pre-wrap; word-break:break-word; display:none;
+    }
+    .result-box.show { display:block; animation:fadeUp 0.4s ease both; }
+    .result-actions { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+    .btn-copy {
+      padding:9px 20px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3);
+      border-radius:10px; color:#34d399; cursor:pointer; font-family:'DM Sans',sans-serif;
+      font-size:0.83rem; transition:all 0.2s;
+    }
+    .btn-copy:hover { background:rgba(16,185,129,0.22); }
+    .btn-copy.copied { background:rgba(16,185,129,0.3); }
+    .sentiment-badge {
+      display:inline-flex; align-items:center; gap:8px; font-size:1.05rem; font-weight:700;
+      padding:10px 20px; border-radius:12px; margin-bottom:16px;
+    }
+    .sentiment-badge.positive { background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.35); color:#34d399; }
+    .sentiment-badge.negative { background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; }
+    .sentiment-badge.neutral { background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.3); color:#fbbf24; }
+    .sentiment-score { font-size:0.75rem; opacity:0.75; font-weight:400; }
+    .platform-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:8px; margin-bottom:18px; }
+    .platform-card {
+      padding:12px 8px; background:rgba(255,255,255,0.03); border:1px solid var(--border);
+      border-radius:10px; text-align:center; cursor:pointer; transition:all 0.2s; font-size:0.85rem;
+    }
+    .platform-card:hover { border-color:rgba(124,58,237,0.4); background:rgba(124,58,237,0.06); }
+    .platform-card.selected { border-color:var(--accent); background:rgba(124,58,237,0.12); }
+    .email-type-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px; margin-bottom:18px; }
+  </style>
+</head>
+<body>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-brand" onclick="handleLogoClick()">⬡ BIZFORGE</div>
+    <div class="nav-right">
+      <span id="nav-username" style="display:none"></span>
+      <span class="nav-step" id="nav-step" style="display:none"></span>
+      <select class="lang-selector" id="lang-selector">
+        <option value="en">EN</option>
+        <option value="hi">HI</option>
+        <option value="te">TE</option>
+        <option value="ta">TA</option>
+        <option value="es">ES</option>
+      </select>
+      <button type="button" class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">☀️</button>
+      <button type="button" class="btn-logout" id="logout-btn" onclick="handleLogout()" style="display:none" data-i18n="nav.signout">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- ══════════════ LANDING PAGE ══════════════ -->
+  <div id="page-landing" class="page active">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-eyebrow" data-i18n="hero.eyebrow">✦ AI-Powered Brand Builder</div>
+      <h1 data-i18n="hero.title">BUILD YOUR<br><span class="gradient-text">BRAND IDENTITY</span><br>WITH AI</h1>
+      <p class="hero-sub" data-i18n="hero.subtitle">From brand names to logos, color palettes and marketing copy — create your complete brand in minutes. No design skills needed.</p>
+      <div class="hero-cta-group">
+        <button type="button" class="btn-hero" onclick="goToApp('auth')" data-i18n="hero.start">🚀 Start Building Free</button>
+        <button type="button" class="btn-hero-outline" onclick="document.getElementById('info-section').scrollIntoView({behavior:'smooth'})" data-i18n="hero.features">See Features ↓</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item"><div class="stat-num">10+</div><div class="stat-label" data-i18n="hero.stats.tools">AI Tools</div></div>
+        <div class="stat-item"><div class="stat-num">5</div><div class="stat-label" data-i18n="hero.stats.languages">Languages</div></div>
+        <div class="stat-item"><div class="stat-num">&lt;5m</div><div class="stat-label" data-i18n="hero.stats.time">Full Brand Kit</div></div>
+        <div class="stat-item"><div class="stat-num">∞</div><div class="stat-label" data-i18n="hero.stats.regenerations">Regenerations</div></div>
+      </div>
+    </div>
+
+    <!-- Marquee -->
+    <div class="marquee-wrap">
+      <div class="marquee-track">
+        <span class="marquee-item" data-i18n="marquee.names">Brand Names</span><span class="marquee-item marquee-dot">✦</span>
+        <span class="marquee-item" data-i18n="marquee.logo">Logo Design</span><span class="marquee-item marquee-dot">✦</span>
+        <span class="marquee-item" data-i18n="marquee.colors">Color Palettes</span><span class="marquee-item marquee-dot">✦</span>
+        <span class="marquee-item" data-i18n="marquee.taglines">Taglines</span><span class="marquee-item marquee-dot">✦</span>
+        <span class="marquee-item" data-i18n="marquee.domain">Domain Checker</span><span class="marquee-item marquee-dot">✦</span>
+        <span class="marquee-item" data-i18n="marquee.competitor">Competitor Analysis</span><span class="marquee-item marquee-dot">✦</span>
+        <span class="marquee-item" data-i18n="marquee.marketing">Marketing Content</span><span class="marquee-item marquee-dot">✦</span>
+        <span class="marquee-item" data-i18n="marquee.chat">AI Branding Chat</span><span class="marquee-item marquee-dot">✦</span>
+        <span class="marquee-item" data-i18n="marquee.sentiment">Sentiment Analysis</span><span class="marquee-item marquee-dot">✦</span>
+        <!-- duplicate for seamless loop -->
+        <span class="marquee-item" data-i18n="marquee.names">Brand Names</span><span class="marquee-item marquee-dot">✦</span>
+        <span class="marquee-item" data-i18n="marquee.logo">Logo Design</span><span class="marquee-item marquee-dot">✦</span>
+        <span class="marquee-item" data-i18n="marquee.colors">Color Palettes</span><span class="marquee-item marquee-dot">✦</span>
+        <span class="marquee-item" data-i18n="marquee.taglines">Taglines</span><span class="marquee-item marquee-dot">✦</span>
+        <span class="marquee-item" data-i18n="marquee.domain">Domain Checker</span><span class="marquee-item marquee-dot">✦</span>
+        <span class="marquee-item" data-i18n="marquee.competitor">Competitor Analysis</span><span class="marquee-item marquee-dot">✦</span>
+        <span class="marquee-item" data-i18n="marquee.marketing">Marketing Content</span><span class="marquee-item marquee-dot">✦</span>
+        <span class="marquee-item" data-i18n="marquee.chat">AI Branding Chat</span><span class="marquee-item marquee-dot">✦</span>
+        <span class="marquee-item" data-i18n="marquee.sentiment">Sentiment Analysis</span><span class="marquee-item marquee-dot">✦</span>
+      </div>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="features-section">
+      <p class="section-label" data-i18n="features.label">What You Get</p>
+      <h2 class="section-title" data-i18n="features.title">EVERY TOOL YOU NEED TO <em>LAUNCH</em></h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <span class="feature-num">01</span>
+          <span class="feature-icon">🏷️</span>
+          <div class="feature-name" data-i18n="features.names.title">Brand Names</div>
+          <div class="feature-desc" data-i18n="features.names.desc">AI generates 10 unique, industry-specific brand name ideas tailored to your tone and keywords — with instant domain availability checking.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-num">02</span>
+          <span class="feature-icon">🎨</span>
+          <div class="feature-name" data-i18n="features.logo.title">Logo Generator</div>
+          <div class="feature-desc" data-i18n="features.logo.desc">Get custom AI logo concepts in 3 distinct styles — Minimal, Bold, and Elegant — using SDXL image generation.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-num">03</span>
+          <span class="feature-icon">📣</span>
+          <div class="feature-name" data-i18n="features.marketing.title">Marketing Content</div>
+          <div class="feature-desc" data-i18n="features.marketing.desc">Generate product descriptions, social posts, email campaigns, and ad copy in seconds — perfectly aligned with your brand voice.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-num">04</span>
+          <span class="feature-icon">🌈</span>
+          <div class="feature-name" data-i18n="features.design.title">Design System</div>
+          <div class="feature-desc" data-i18n="features.design.desc">Professionally curated color palettes with 5 HEX codes each, typography suggestions, and visual style guides for your brand.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-num">05</span>
+          <span class="feature-icon">🔍</span>
+          <div class="feature-name" data-i18n="features.domain.title">Domain Checker</div>
+          <div class="feature-desc" data-i18n="features.domain.desc">Instantly check if your brand's .com domain is available. Runs automatically on all generated names so you can pick a winner.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-num">06</span>
+          <span class="feature-icon">📊</span>
+          <div class="feature-name" data-i18n="features.competitor.title">Competitor Analysis</div>
+          <div class="feature-desc" data-i18n="features.competitor.desc">Deep-dive AI analysis of any competitor website — color strategy, messaging style, CTAs, keywords, and positioning gaps.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-num">07</span>
+          <span class="feature-icon">💬</span>
+          <div class="feature-name" data-i18n="features.chat.title">Branding Chat</div>
+          <div class="feature-desc" data-i18n="features.chat.desc">Chat with an AI branding consultant that has full context of your brand and gives strategic, actionable advice.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-num">08</span>
+          <span class="feature-icon">🎙️</span>
+          <div class="feature-name" data-i18n="features.sentiment.title">Sentiment Analysis</div>
+          <div class="feature-desc" data-i18n="features.sentiment.desc">Evaluate how your brand messaging resonates emotionally with your target audience — Positive, Neutral, or Negative with confidence scores.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Why BizForge -->
+    <div class="info-section" id="info-section">
+      <p class="section-label" data-i18n="why.label">Why Choose BizForge?</p>
+      <h2 class="section-title" style="text-align:left;margin-bottom:0;" data-i18n="why.title">THE SMART WAY TO<br><em>BUILD A BRAND</em></h2>
+      <div class="info-grid">
+        <div class="info-tile"><span class="info-tile-icon">⚡</span><div><div class="info-tile-label" data-i18n="why.instant.label">Instant Results</div><div class="info-tile-text" data-i18n="why.instant.text">Complete brand kit in under 5 minutes with no design experience needed.</div></div></div>
+        <div class="info-tile"><span class="info-tile-icon">🤖</span><div><div class="info-tile-label" data-i18n="why.ai.label">AI-Powered</div><div class="info-tile-text" data-i18n="why.ai.text">Groq AI, SDXL image generation, and IBM Granite working together.</div></div></div>
+        <div class="info-tile"><span class="info-tile-icon">🌍</span><div><div class="info-tile-label" data-i18n="why.multilingual.label">Multilingual</div><div class="info-tile-text" data-i18n="why.multilingual.text">Full support for English, Spanish, French, German, and Hindi.</div></div></div>
+        <div class="info-tile"><span class="info-tile-icon">🌐</span><div><div class="info-tile-label" data-i18n="why.domain.label">Domain Checker</div><div class="info-tile-text" data-i18n="why.domain.text">Automatic .com availability check for every name generated.</div></div></div>
+        <div class="info-tile"><span class="info-tile-icon">💼</span><div><div class="info-tile-label" data-i18n="why.professional.label">Professional Output</div><div class="info-tile-text" data-i18n="why.professional.text">Download full brand kits as JSON and generate complete websites.</div></div></div>
+        <div class="info-tile"><span class="info-tile-icon">🔄</span><div><div class="info-tile-label" data-i18n="why.unlimited.label">Unlimited Regenerate</div><div class="info-tile-text" data-i18n="why.unlimited.text">Not happy with results? Regenerate with custom feedback anytime.</div></div></div>
+        <div class="info-tile"><span class="info-tile-icon">☀️</span><div><div class="info-tile-label" data-i18n="why.theme.label">Light & Dark Mode</div><div class="info-tile-text" data-i18n="why.theme.text">One-click theme toggle for your preferred working environment.</div></div></div>
+        <div class="info-tile"><span class="info-tile-icon">📱</span><div><div class="info-tile-label" data-i18n="why.mobile.label">Mobile Ready</div><div class="info-tile-text" data-i18n="why.mobile.text">All layout components scale fluidly for small and large screens.</div></div></div>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div data-i18n="footer.copyright">© 2025 <strong>BizForge</strong> — AI Brand Builder. All rights reserved.</div>
+      <div class="model-credits" data-i18n="footer.credits">Powered by Groq AI · IBM Granite · SDXL · Speech Recognition</div>
+    </footer>
+  </div>
+
+  <!-- ══════════════ APP PAGE ══════════════ -->
+  <div id="page-app" class="page">
+    <div class="app-inner">
+
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span id="progress-label" data-i18n="progress.start">Getting Started</span>
+          <span id="progress-percent">0%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+
+      <div class="alert" id="alert"><span>⚠️</span><span id="alert-text">Error</span></div>
+
+      <div class="loading-state" id="loading">
+        <div class="spinner"></div>
+        <div id="loading-text" data-i18n="loading.default">Loading...</div>
+      </div>
+
+      <!-- ── AUTH ── -->
+      <div class="app-section active" id="sec-auth">
+        <div class="page-header">
+          <div class="eyebrow" data-i18n="auth.eyebrow">Welcome</div>
+          <h1 data-i18n="auth.title">SIGN IN TO <em>BizForge</em></h1>
+          <p class="header-subtitle" data-i18n="auth.subtitle">Create your brand identity with AI — free, fast, and professional.</p>
+        </div>
+        <div class="card" style="cursor:default;padding:32px;max-width:480px;">
+          <div class="form-group">
+            <label data-i18n="auth.username_label">Username</label>
+            <input type="text" id="login-username" data-i18n-placeholder="auth.username_placeholder" placeholder="Enter your username">
+          </div>
+          <div class="form-group">
+            <label data-i18n="auth.password_label">Password</label>
+            <input type="password" id="login-password" data-i18n-placeholder="auth.password_placeholder" placeholder="Enter your password">
+          </div>
+          <div style="display:flex;gap:12px;margin-top:8px;">
+            <button type="button" class="btn-primary" id="login-btn" onclick="handleLogin()" data-i18n="auth.signin">Sign In</button>
+            <button type="button" class="btn-secondary" id="register-btn" onclick="handleRegister()" data-i18n="auth.create">Create Account</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MODE ── -->
+      <div class="app-section" id="sec-mode">
+        <div class="page-header">
+          <div class="eyebrow" data-i18n="mode.eyebrow">Step 1 — Choose Mode</div>
+          <h1 data-i18n="mode.title">WHAT DO YOU WANT TO <em>CREATE?</em></h1>
+          <p class="header-subtitle" data-i18n="mode.subtitle">Select the type of brand assets you need</p>
+        </div>
+        <div class="grid mode-grid">
+          <div class="card mode-card" onclick="selectMode('full')"><div class="mode-icon">🏷️🎨</div><div class="mode-title" data-i18n="mode.full">Full Brand Kit</div><div class="mode-desc" data-i18n="mode.full_desc">Complete brand identity + website</div></div>
+          <div class="card mode-card" onclick="selectMode('name')"><div class="mode-icon">🏷️</div><div class="mode-title" data-i18n="mode.name">Brand Names</div><div class="mode-desc" data-i18n="mode.name_desc">Generate + check domain availability</div></div>
+          <div class="card mode-card" onclick="selectMode('tagline')"><div class="mode-icon">💬</div><div class="mode-title" data-i18n="mode.tagline">Tagline Only</div><div class="mode-desc" data-i18n="mode.tagline_desc">Create powerful taglines</div></div>
+          <div class="card mode-card" onclick="selectMode('logo')"><div class="mode-icon">🎨</div><div class="mode-title" data-i18n="mode.logo">Logo Only</div><div class="mode-desc" data-i18n="mode.logo_desc">Design your brand logo</div></div>
+          <div class="card mode-card" onclick="selectMode('colors')"><div class="mode-icon">🌈</div><div class="mode-title" data-i18n="mode.colors">Color Palette</div><div class="mode-desc" data-i18n="mode.colors_desc">Generate brand colors</div></div>
+          <div class="card mode-card" onclick="selectMode('domain')"><div class="mode-icon">🌐</div><div class="mode-title" data-i18n="mode.domain">Domain Checker</div><div class="mode-desc" data-i18n="mode.domain_desc">Check your brand's domain</div></div>
+          <div class="card mode-card" onclick="selectMode('competitor')"><div class="mode-icon">🔍</div><div class="mode-title" data-i18n="mode.competitor">Competitor Analysis</div><div class="mode-desc" data-i18n="mode.competitor_desc">Analyze competitor websites</div></div>
+          <div class="card mode-card" onclick="selectMode('sentiment')"><div class="mode-icon">😊</div><div class="mode-title">Sentiment Analysis</div><div class="mode-desc">Analyze review or feedback sentiment</div></div>
+          <div class="card mode-card" onclick="selectMode('product-desc')"><div class="mode-icon">📦</div><div class="mode-title">Product Description</div><div class="mode-desc">AI-written product descriptions</div></div>
+          <div class="card mode-card" onclick="selectMode('social-post')"><div class="mode-icon">📱</div><div class="mode-title">Social Post</div><div class="mode-desc">Generate posts with hashtags</div></div>
+          <div class="card mode-card" onclick="selectMode('email-gen')"><div class="mode-icon">✉️</div><div class="mode-title">Email Generator</div><div class="mode-desc">Brand-aware email drafts</div></div>
+        </div>
+      </div>
+
+      <!-- ── NAME INPUT (for non-full modes that need a name first) ── -->
+      <div class="app-section" id="sec-name-input">
+        <div class="page-header">
+          <div class="eyebrow" data-i18n="name.eyebrow">Your Brand Name</div>
+          <h1 data-i18n="name.title">ENTER YOUR <em>BRAND NAME</em></h1>
+          <p class="header-subtitle" id="name-input-subtitle" data-i18n="name.subtitle">We need your brand name to get started</p>
+        </div>
+        <div class="card" style="cursor:default;padding:32px;max-width:480px;">
+          <div class="form-group">
+            <label data-i18n="name.label">Brand Name</label>
+            <div class="input-mic-wrap">
+              <input type="text" id="manual-brand-name" data-i18n-placeholder="name.placeholder" placeholder="e.g. Apple, Nike, Glowify">
+              <button type="button" class="mic-btn" onclick="startMic('manual-brand-name',this)" title="Speak brand name">🎤</button>
+            </div>
+          </div>
+          <button type="button" class="btn-primary" onclick="proceedToIntake()" style="width:100%;" data-i18n="buttons.continue">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ── INTAKE ── -->
+      <div class="app-section" id="sec-intake">
+        <div class="page-header">
+          <div class="eyebrow" data-i18n="intake.eyebrow">Brand Setup</div>
+          <h1 data-i18n="intake.title">TELL US ABOUT<br><em>your brand</em></h1>
+          <p class="header-subtitle" id="intake-subtitle" data-i18n="intake.subtitle">Answer these questions to build your brand assets</p>
+        </div>
+        <div class="card" style="cursor:default;padding:32px;">
+          <div class="form-group">
+            <label data-i18n="intake.q1">What does your business do? *</label>
+            <div class="textarea-mic-wrap">
+              <textarea id="intake-q1" data-i18n-placeholder="intake.q1_placeholder" placeholder="e.g. We create sustainable fashion from recycled ocean plastics for eco-conscious consumers..." rows="3"></textarea>
+              <button type="button" class="textarea-mic-btn" onclick="startMic('intake-q1',this)" title="Speak your answer">🎤</button>
+            </div>
+            <div class="char-counter"><span id="q1-count">0</span>/300</div>
+          </div>
+          <div class="form-group">
+            <label data-i18n="intake.q2">Who is your target audience? *</label>
+            <div class="textarea-mic-wrap">
+              <textarea id="intake-q2" data-i18n-placeholder="intake.q2_placeholder" placeholder="e.g. Eco-conscious professionals aged 25-45 who care about sustainability..." rows="3"></textarea>
+              <button type="button" class="textarea-mic-btn" onclick="startMic('intake-q2',this)" title="Speak your answer">🎤</button>
+            </div>
+            <div class="char-counter"><span id="q2-count">0</span>/300</div>
+          </div>
+          <div class="form-group">
+            <label data-i18n="intake.industry_label">Select your industry *</label>
+            <div class="option-grid" id="industry-grid">
+              <div class="option-card" onclick="selectOption(this,'industry','Technology')" data-i18n="intake.industry.tech">💻 Technology</div>
+              <div class="option-card" onclick="selectOption(this,'industry','Fashion')" data-i18n="intake.industry.fashion">👗 Fashion</div>
+              <div class="option-card" onclick="selectOption(this,'industry','Food & Bev')" data-i18n="intake.industry.food">🍕 Food & Bev</div>
+              <div class="option-card" onclick="selectOption(this,'industry','Health')" data-i18n="intake.industry.health">🏥 Health</div>
+              <div class="option-card" onclick="selectOption(this,'industry','Finance')" data-i18n="intake.industry.finance">💰 Finance</div>
+              <div class="option-card" onclick="selectOption(this,'industry','Education')" data-i18n="intake.industry.education">📚 Education</div>
+              <div class="option-card" onclick="selectOption(this,'industry','Real Estate')" data-i18n="intake.industry.realestate">🏠 Real Estate</div>
+              <div class="option-card" onclick="selectOption(this,'industry','Entertainment')" data-i18n="intake.industry.entertainment">🎬 Entertainment</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label data-i18n="intake.tone_label">Select your brand tone *</label>
+            <div class="option-grid" id="tone-grid">
+              <div class="option-card" onclick="selectOption(this,'tone','Professional')" data-i18n="intake.tone.professional">💼 Professional</div>
+              <div class="option-card" onclick="selectOption(this,'tone','Playful')" data-i18n="intake.tone.playful">🎉 Playful</div>
+              <div class="option-card" onclick="selectOption(this,'tone','Luxury')" data-i18n="intake.tone.luxury">👑 Luxury</div>
+              <div class="option-card" onclick="selectOption(this,'tone','Bold')" data-i18n="intake.tone.bold">🔥 Bold</div>
+              <div class="option-card" onclick="selectOption(this,'tone','Minimal')" data-i18n="intake.tone.minimal">⚪ Minimal</div>
+              <div class="option-card" onclick="selectOption(this,'tone','Innovative')" data-i18n="intake.tone.innovative">🚀 Innovative</div>
+              <div class="option-card" onclick="selectOption(this,'tone','Friendly')" data-i18n="intake.tone.friendly">🤝 Friendly</div>
+              <div class="option-card" onclick="selectOption(this,'tone','Authoritative')" data-i18n="intake.tone.authoritative">📊 Authoritative</div>
+            </div>
+          </div>
+          <button type="button" class="btn-primary" id="intake-btn" onclick="handleIntake()" style="width:100%;" data-i18n="buttons.continue">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ── COMPETITOR ── -->
+      <div class="app-section" id="sec-competitor">
+        <div class="page-header">
+          <div class="eyebrow" data-i18n="competitor.eyebrow">Competitor Analysis</div>
+          <h1 data-i18n="competitor.title">ANALYZE <em>COMPETITORS</em></h1>
+          <p class="header-subtitle" data-i18n="competitor.subtitle">Enter a competitor URL to analyze their brand strategy, keywords, colors, and CTAs</p>
+        </div>
+        <div class="card" style="cursor:default;padding:32px;">
+          <label data-i18n="competitor.url_label">Competitor Website URL</label>
+          <div class="competitor-input" style="margin-top:8px;">
+            <input type="text" id="competitor-url" data-i18n-placeholder="competitor.url_placeholder" placeholder="https://competitor.com">
+            <button type="button" class="btn-primary" onclick="analyzeCompetitor()" data-i18n="competitor.analyze">Analyze →</button>
+          </div>
+          <div id="competitor-results" class="analysis-results hidden"></div>
+        </div>
+        <div style="margin-top:18px;text-align:center;">
+          <button type="button" class="btn-secondary" onclick="showSection('mode')" data-i18n="buttons.back">← Back to Tools</button>
+        </div>
+      </div>
+
+      <!-- ── DOMAIN CHECKER (standalone) ── -->
+      <div class="app-section" id="sec-domain">
+        <div class="page-header">
+          <div class="eyebrow" data-i18n="domain.eyebrow">Domain Availability</div>
+          <h1 data-i18n="domain.title">CHECK YOUR <em>DOMAIN</em></h1>
+          <p class="header-subtitle" data-i18n="domain.subtitle">Enter one or more brand names to check if their .com domain is available</p>
+        </div>
+        <div class="card" style="cursor:default;padding:32px;">
+          <label data-i18n="domain.label">Brand Names to Check <span style="color:var(--muted);font-size:0.8rem;" data-i18n="domain.hint">(comma-separated for multiple)</span></label>
+          <div class="domain-input-row" style="margin-top:8px;">
+            <input type="text" id="domain-check-input" data-i18n-placeholder="domain.placeholder" placeholder="e.g. Glowify, Lumena, Sparkr">
+            <button type="button" class="btn-primary" onclick="checkDomains()" data-i18n="domain.check">Check →</button>
+          </div>
+          <div id="domain-check-results" class="domain-results"></div>
+        </div>
+        <div style="margin-top:18px;text-align:center;">
+          <button type="button" class="btn-secondary" onclick="showSection('mode')" data-i18n="buttons.back">← Back to Tools</button>
+        </div>
+      </div>
+
+      <!-- ── BRAND NAMES ── -->
+      <div class="app-section" id="sec-brandnames">
+        <div class="page-header">
+          <div class="eyebrow" data-i18n="brandnames.eyebrow">Brand Names</div>
+          <h1 data-i18n="brandnames.title">CHOOSE YOUR <em>brand name</em></h1>
+          <p class="header-subtitle" data-i18n="brandnames.subtitle">AI generated 10 unique names — domain availability checked automatically</p>
+        </div>
+        <div class="grid" id="brandnames-grid"></div>
+        <div class="feedback-section">
+          <label style="margin-bottom:10px;" data-i18n="brandnames.feedback_label">Not happy? Give feedback and regenerate:</label>
+          <div class="feedback-row">
+            <div class="input-mic-wrap" style="flex:1;">
+              <input type="text" class="feedback-input" id="brandnames-feedback-input" data-i18n-placeholder="brandnames.feedback_placeholder" placeholder="e.g. Make them shorter, more tech-focused, avoid hyphens...">
+              <button type="button" class="mic-btn" onclick="startMic('brandnames-feedback-input',this)" title="Speak feedback">🎤</button>
+            </div>
+            <button type="button" class="btn-secondary" onclick="regenerateBrandNames()" data-i18n="buttons.regenerate">↺ Regenerate</button>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <div class="selected-preview"><span data-i18n="labels.selected">Selected:</span><span class="preview-value" id="brandnames-preview">None</span></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button type="button" class="btn-success" id="check-domains-btn" onclick="checkSelectedNames()" style="display:none" data-i18n="buttons.check_domains">🌐 Check Domains</button>
+            <button type="button" class="btn-primary" id="brandnames-next" onclick="nextStep()" disabled data-i18n="buttons.continue">Continue →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAGLINES ── -->
+      <div class="app-section" id="sec-taglines">
+        <div class="page-header">
+          <div class="eyebrow" data-i18n="taglines.eyebrow">Taglines</div>
+          <h1 data-i18n="taglines.title">PICK YOUR <em>tagline</em></h1>
+          <p class="header-subtitle" data-i18n="taglines.subtitle">5 AI-generated taglines — click to select your favorite</p>
+        </div>
+        <div class="grid" id="taglines-grid"></div>
+        <div class="feedback-section">
+          <div class="feedback-row">
+            <div class="input-mic-wrap" style="flex:1;">
+              <input type="text" class="feedback-input" id="taglines-feedback-input" data-i18n-placeholder="taglines.feedback_placeholder" placeholder="e.g. More emotional, shorter, include our product name...">
+              <button type="button" class="mic-btn" onclick="startMic('taglines-feedback-input',this)" title="Speak feedback">🎤</button>
+            </div>
+            <button type="button" class="btn-secondary" onclick="regenerateTaglines()" data-i18n="buttons.regenerate">↺ Regenerate</button>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <div class="selected-preview"><span data-i18n="labels.selected">Selected:</span><span class="preview-value" id="taglines-preview">None</span></div>
+          <button type="button" class="btn-primary" id="taglines-next" onclick="nextStep()" disabled data-i18n="buttons.continue">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ── LOGO STYLE ── -->
+      <div class="app-section" id="sec-logo-style">
+        <div class="page-header">
+          <div class="eyebrow" data-i18n="logo.style_eyebrow">Logo Design — Step 1</div>
+          <h1 data-i18n="logo.style_title">CHOOSE YOUR <em>logo style</em></h1>
+          <p class="header-subtitle" data-i18n="logo.style_subtitle">3 AI-generated style concepts — select one to generate your logo</p>
+        </div>
+        <div class="grid" id="logo-style-grid"></div>
+        <div class="feedback-section">
+          <div class="feedback-row">
+            <div class="input-mic-wrap" style="flex:1;">
+              <input type="text" class="feedback-input" id="logo-style-feedback-input" data-i18n-placeholder="logo.style_feedback" placeholder="e.g. More minimalist, use geometric shapes, darker colors...">
+              <button type="button" class="mic-btn" onclick="startMic('logo-style-feedback-input',this)" title="Speak feedback">🎤</button>
+            </div>
+            <button type="button" class="btn-secondary" onclick="regenerateLogoStyles()" data-i18n="buttons.regenerate_styles">↺ Regenerate Styles</button>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <div class="selected-preview"><span data-i18n="labels.style">Style:</span><span class="preview-value" id="logo-style-preview">None</span></div>
+          <button type="button" class="btn-primary" id="logo-style-next" onclick="generateSelectedLogo()" disabled data-i18n="buttons.generate_logo">Generate Logo →</button>
+        </div>
+      </div>
+
+      <!-- ── LOGO RESULT ── -->
+      <div class="app-section" id="sec-logo-result">
+        <div class="page-header">
+          <div class="eyebrow" data-i18n="logo.result_eyebrow">Logo Design — Step 2</div>
+          <h1 data-i18n="logo.result_title">YOUR <em>logo</em> IS READY</h1>
+          <p class="header-subtitle" data-i18n="logo.result_subtitle">Your AI-generated logo concept</p>
+        </div>
+        <div class="card" style="cursor:default;text-align:center;padding:40px;">
+          <div class="logo-preview" style="width:200px;height:200px;margin:0 auto 24px;">
+            <img id="generated-logo-img" src="" alt="Generated Logo" style="display:none;">
+            <span id="generated-logo-placeholder">🎨</span>
+          </div>
+          <div class="card-title" id="generated-logo-style"></div>
+          <div class="card-prompt" id="generated-logo-prompt"></div>
+        </div>
+        <div class="bottom-bar" style="justify-content:flex-end;">
+          <button type="button" class="btn-secondary" onclick="showSection('logo-style')" data-i18n="buttons.back_styles">← Back to Styles</button>
+          <button type="button" class="btn-primary" onclick="nextStep()" data-i18n="buttons.continue">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ── COLORS ── -->
+      <div class="app-section" id="sec-colors">
+        <div class="page-header">
+          <div class="eyebrow" data-i18n="colors.eyebrow">Color Palette</div>
+          <h1 data-i18n="colors.title">CHOOSE YOUR <em>colors</em></h1>
+          <p class="header-subtitle" data-i18n="colors.subtitle">AI-generated color palettes — click to select your brand colors</p>
+        </div>
+        <div class="grid" id="colors-grid"></div>
+        <div class="feedback-section">
+          <div class="feedback-row">
+            <div class="input-mic-wrap" style="flex:1;">
+              <input type="text" class="feedback-input" id="colors-feedback-input" data-i18n-placeholder="colors.feedback_placeholder" placeholder="e.g. More vibrant, earthy tones, avoid red...">
+              <button type="button" class="mic-btn" onclick="startMic('colors-feedback-input',this)" title="Speak feedback">🎤</button>
+            </div>
+            <button type="button" class="btn-secondary" onclick="regenerateColors()" data-i18n="buttons.regenerate">↺ Regenerate</button>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <div class="selected-preview"><span data-i18n="labels.selected">Selected:</span><span class="preview-value" id="colors-preview">None</span></div>
+          <button type="button" class="btn-primary" id="colors-next" onclick="nextStep()" disabled data-i18n="buttons.continue">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ── FINAL ── -->
+      <div class="app-section" id="sec-final">
+        <div class="page-header">
+          <div class="eyebrow" data-i18n="final.eyebrow">Complete 🎉</div>
+          <h1 data-i18n="final.title">YOUR <em>brand</em> IS READY</h1>
+          <p class="header-subtitle" data-i18n="final.subtitle">Here's a summary of everything you've created</p>
+        </div>
+        <div class="summary-card">
+          <div class="summary-row"><div class="summary-label" data-i18n="final.brandname_label">Brand Name</div><div class="summary-value" id="final-brandname">—</div></div>
+          <div class="summary-row"><div class="summary-label" data-i18n="final.tagline_label">Tagline</div><div class="summary-value" id="final-tagline">—</div></div>
+          <div class="summary-row"><div class="summary-label" data-i18n="final.logo_label">Logo Style</div><div class="summary-value" id="final-logo">—</div></div>
+          <div class="summary-row"><div class="summary-label" data-i18n="final.colors_label">Colors</div><div class="summary-value" id="final-colors-display"></div></div>
+        </div>
+        <div id="website-generator" class="hidden">
+          <button type="button" class="btn-primary" id="generate-website-btn" onclick="generateWebsite()" style="width:100%;margin-bottom:22px;" data-i18n="final.generate_website">🚀 Generate My Website</button>
+          <div id="website-preview" class="hidden">
+            <iframe class="preview-frame" id="website-iframe" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+            <div style="margin-top:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+              <a id="download-link" download="brand-website.html" class="btn-secondary" style="text-decoration:none;" data-i18n="final.download_html">⬇ Download HTML</a>
+              <button type="button" class="btn-secondary" onclick="showSection('mode')" data-i18n="final.create_another">Create Another Brand</button>
+            </div>
+          </div>
+        </div>
+        <div id="download-options" class="download-options">
+          <button type="button" class="btn-primary" onclick="downloadJSON()" data-i18n="final.download_json">📥 Download Brand Kit (JSON)</button>
+          <button type="button" class="btn-secondary" onclick="showSection('mode')" data-i18n="final.create_another">🔄 Create Another</button>
+        </div>
+      </div>
+
+
+      <!-- ── SENTIMENT ANALYSIS ── -->
+      <div class="app-section" id="sec-sentiment">
+        <div class="page-header">
+          <div class="eyebrow">Sentiment Analysis</div>
+          <h1>ANALYZE <em>SENTIMENT</em></h1>
+          <p class="header-subtitle">Paste a review, comment, or feedback — AI will detect the emotional tone and give you insights</p>
+        </div>
+        <div class="card" style="cursor:default;padding:32px;">
+          <div class="form-group">
+            <label>Review / Feedback Text *</label>
+            <div class="textarea-mic-wrap">
+              <textarea id="sentiment-input" rows="5" placeholder="e.g. This product is absolutely amazing! The quality exceeded my expectations..."></textarea>
+              <button type="button" class="textarea-mic-btn" onclick="startMic('sentiment-input',this)" title="Speak your text">🎤</button>
+            </div>
+          </div>
+          <button type="button" class="btn-primary" onclick="analyzeSentiment()" style="width:100%;">🔍 Analyze Sentiment →</button>
+          <div class="result-box" id="sentiment-result"></div>
+        </div>
+        <div style="margin-top:18px;text-align:center;">
+          <button type="button" class="btn-secondary" onclick="showSection('mode')">← Back to Tools</button>
+        </div>
+      </div>
+
+      <!-- ── PRODUCT DESCRIPTION ── -->
+      <div class="app-section" id="sec-product-desc">
+        <div class="page-header">
+          <div class="eyebrow">Product Description</div>
+          <h1>GENERATE A <em>PRODUCT DESC</em></h1>
+          <p class="header-subtitle">Tell us about your product and AI will write a compelling, conversion-focused description</p>
+        </div>
+        <div class="card" style="cursor:default;padding:32px;">
+          <div class="form-group">
+            <label>Product Name *</label>
+            <div class="input-mic-wrap">
+              <input type="text" id="product-name-input" placeholder="e.g. GlowKit Pro, AirBlend 3000...">
+              <button type="button" class="mic-btn" onclick="startMic('product-name-input',this)" title="Speak">🎤</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Describe your product — features, materials, benefits *</label>
+            <div class="textarea-mic-wrap">
+              <textarea id="product-desc-input" rows="4" placeholder="e.g. Wireless noise-cancelling headphones with 40hr battery, premium leather cushions, built-in AI EQ..."></textarea>
+              <button type="button" class="textarea-mic-btn" onclick="startMic('product-desc-input',this)" title="Speak your text">🎤</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Target Audience</label>
+            <div class="input-mic-wrap">
+              <input type="text" id="product-audience-input" placeholder="e.g. Remote workers, audiophiles, gamers...">
+              <button type="button" class="mic-btn" onclick="startMic('product-audience-input',this)" title="Speak">🎤</button>
+            </div>
+          </div>
+          <button type="button" class="btn-primary" onclick="generateProductDesc()" style="width:100%;">✍️ Generate Description →</button>
+          <div class="result-box" id="product-desc-result">
+            <div class="result-actions">
+              <button type="button" class="btn-copy" onclick="copyResult('product-desc-result')">📋 Copy</button>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:18px;text-align:center;">
+          <button type="button" class="btn-secondary" onclick="showSection('mode')">← Back to Tools</button>
+        </div>
+      </div>
+
+      <!-- ── SOCIAL POST ── -->
+      <div class="app-section" id="sec-social-post">
+        <div class="page-header">
+          <div class="eyebrow">Social Post Generator</div>
+          <h1>CREATE A <em>SOCIAL POST</em></h1>
+          <p class="header-subtitle">Tell the AI what you want to post about and it'll write a compelling post with hashtags</p>
+        </div>
+        <div class="card" style="cursor:default;padding:32px;">
+          <div class="form-group">
+            <label>Platform</label>
+            <div class="platform-grid">
+              <div class="platform-card selected" onclick="selectPlatform(this,'Instagram')">📸 Instagram</div>
+              <div class="platform-card" onclick="selectPlatform(this,'Twitter/X')">🐦 Twitter/X</div>
+              <div class="platform-card" onclick="selectPlatform(this,'LinkedIn')">💼 LinkedIn</div>
+              <div class="platform-card" onclick="selectPlatform(this,'Facebook')">📘 Facebook</div>
+              <div class="platform-card" onclick="selectPlatform(this,'Threads')">🧵 Threads</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>What do you want to post about? *</label>
+            <div class="textarea-mic-wrap">
+              <textarea id="social-topic-input" rows="4" placeholder="e.g. We just launched our new summer collection! It has 20 new eco-friendly styles at great prices..."></textarea>
+              <button type="button" class="textarea-mic-btn" onclick="startMic('social-topic-input',this)" title="Speak your idea">🎤</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Tone (optional)</label>
+            <div class="option-grid" id="social-tone-grid" style="grid-template-columns:repeat(auto-fit,minmax(110px,1fr));">
+              <div class="option-card" onclick="selectSocialTone(this,'Exciting')">🎉 Exciting</div>
+              <div class="option-card" onclick="selectSocialTone(this,'Professional')">💼 Professional</div>
+              <div class="option-card" onclick="selectSocialTone(this,'Casual')">😊 Casual</div>
+              <div class="option-card" onclick="selectSocialTone(this,'Inspirational')">✨ Inspirational</div>
+            </div>
+          </div>
+          <button type="button" class="btn-primary" onclick="generateSocialPost()" style="width:100%;">📱 Generate Post →</button>
+          <div class="result-box" id="social-post-result">
+            <div class="result-actions">
+              <button type="button" class="btn-copy" onclick="copyResult('social-post-result')">📋 Copy Post</button>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:18px;text-align:center;">
+          <button type="button" class="btn-secondary" onclick="showSection('mode')">← Back to Tools</button>
+        </div>
+      </div>
+
+      <!-- ── EMAIL GENERATOR ── -->
+      <div class="app-section" id="sec-email-gen">
+        <div class="page-header">
+          <div class="eyebrow">Email Generator</div>
+          <h1>WRITE AN <em>EMAIL</em></h1>
+          <p class="header-subtitle">Tell the AI what you want to write about and it'll draft a professional email aligned with your brand</p>
+        </div>
+        <div class="card" style="cursor:default;padding:32px;">
+          <div class="form-group">
+            <label>Email Type</label>
+            <div class="email-type-grid">
+              <div class="platform-card selected" onclick="selectEmailType(this,'Welcome Email')">👋 Welcome</div>
+              <div class="platform-card" onclick="selectEmailType(this,'Product Launch')">🚀 Launch</div>
+              <div class="platform-card" onclick="selectEmailType(this,'Promotional Offer')">🎁 Promo</div>
+              <div class="platform-card" onclick="selectEmailType(this,'Newsletter')">📰 Newsletter</div>
+              <div class="platform-card" onclick="selectEmailType(this,'Follow-Up')">🔄 Follow-Up</div>
+              <div class="platform-card" onclick="selectEmailType(this,'Thank You')">🙏 Thank You</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>What should the email be about? *</label>
+            <div class="textarea-mic-wrap">
+              <textarea id="email-topic-input" rows="4" placeholder="e.g. We want to announce our new loyalty program to existing customers with a 20% discount code..."></textarea>
+              <button type="button" class="textarea-mic-btn" onclick="startMic('email-topic-input',this)" title="Speak your idea">🎤</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Recipient Name / Segment (optional)</label>
+            <div class="input-mic-wrap">
+              <input type="text" id="email-recipient-input" placeholder="e.g. VIP customers, New subscribers, {{first_name}}...">
+              <button type="button" class="mic-btn" onclick="startMic('email-recipient-input',this)" title="Speak">🎤</button>
+            </div>
+          </div>
+          <button type="button" class="btn-primary" onclick="generateEmail()" style="width:100%;">✉️ Generate Email →</button>
+          <div class="result-box" id="email-gen-result">
+            <div class="result-actions">
+              <button type="button" class="btn-copy" onclick="copyResult('email-gen-result')">📋 Copy Email</button>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:18px;text-align:center;">
+          <button type="button" class="btn-secondary" onclick="showSection('mode')">← Back to Tools</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════ CHATBOT ══════════════ -->
+  <button type="button" id="chat-fab" onclick="toggleChat()" title="Chat with BizForge AI">💬</button>
+
+  <div id="chat-window">
+    <div class="chat-header">
+      <div class="chat-header-left">
+        <div class="chat-avatar">🤖</div>
+        <div>
+          <div class="chat-header-title">BIZFORGE AI <span class="chat-online"></span></div>
+          <div class="chat-header-sub" data-i18n="chat.subtitle">Branding consultant · Always here</div>
+        </div>
+      </div>
+      <button type="button" class="chat-close" onclick="toggleChat()">✕</button>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="chat-msg bot" data-i18n="chat.greeting">👋 Hi! I'm your BizForge branding consultant. Ask me anything about brand strategy, naming, marketing, or your current brand project!</div>
+    </div>
+    <div class="chat-suggestions" id="chat-suggestions">
+      <button class="chat-suggest-btn" onclick="sendSuggestion(this)" data-i18n="chat.suggest1">What makes a great brand name?</button>
+      <button class="chat-suggest-btn" onclick="sendSuggestion(this)" data-i18n="chat.suggest2">Help me choose my brand tone</button>
+      <button class="chat-suggest-btn" onclick="sendSuggestion(this)" data-i18n="chat.suggest3">Best colors for tech startups?</button>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="chat-input" data-i18n-placeholder="chat.input_placeholder" placeholder="Ask about branding...">
+      <button type="button" class="mic-btn" id="chat-mic-btn" onclick="startMic('chat-input',this)" title="Speak">🎤</button>
+      <button type="button" class="chat-send" id="chat-send-btn" onclick="sendChat()">➤</button>
+    </div>
+  </div>
+
+  <!-- ══════════════ SCRIPT ══════════════ -->
+  <script>
+    // ==================== I18N TRANSLATION SYSTEM ====================
+    const I18N = {
+      en: {
+        meta: { title: "BizForge — AI Brand Builder" },
+        nav: { signout: "Sign Out" },
+        hero: {
+          eyebrow: "✦ AI-Powered Brand Builder",
+          title: `BUILD YOUR<br><span class="gradient-text">BRAND IDENTITY</span><br>WITH AI`,
+          subtitle: "From brand names to logos, color palettes and marketing copy — create your complete brand in minutes. No design skills needed.",
+          start: "🚀 Start Building Free",
+          features: "See Features ↓",
+          stats: {
+            tools: "AI Tools",
+            languages: "Languages",
+            time: "Full Brand Kit",
+            regenerations: "Regenerations"
+          }
+        },
+        marquee: {
+          names: "Brand Names",
+          logo: "Logo Design",
+          colors: "Color Palettes",
+          taglines: "Taglines",
+          domain: "Domain Checker",
+          competitor: "Competitor Analysis",
+          marketing: "Marketing Content",
+          chat: "AI Branding Chat",
+          sentiment: "Sentiment Analysis"
+        },
+        features: {
+          label: "What You Get",
+          title: "EVERY TOOL YOU NEED TO <em>LAUNCH</em>",
+          names: { title: "Brand Names", desc: "AI generates 10 unique, industry-specific brand name ideas tailored to your tone and keywords — with instant domain availability checking." },
+          logo: { title: "Logo Generator", desc: "Get custom AI logo concepts in 3 distinct styles — Minimal, Bold, and Elegant — using SDXL image generation." },
+          marketing: { title: "Marketing Content", desc: "Generate product descriptions, social posts, email campaigns, and ad copy in seconds — perfectly aligned with your brand voice." },
+          design: { title: "Design System", desc: "Professionally curated color palettes with 5 HEX codes each, typography suggestions, and visual style guides for your brand." },
+          domain: { title: "Domain Checker", desc: "Instantly check if your brand's .com domain is available. Runs automatically on all generated names so you can pick a winner." },
+          competitor: { title: "Competitor Analysis", desc: "Deep-dive AI analysis of any competitor website — color strategy, messaging style, CTAs, keywords, and positioning gaps." },
+          chat: { title: "Branding Chat", desc: "Chat with an AI branding consultant that has full context of your brand and gives strategic, actionable advice." },
+          sentiment: { title: "Sentiment Analysis", desc: "Evaluate how your brand messaging resonates emotionally with your target audience — Positive, Neutral, or Negative with confidence scores." }
+        },
+        why: {
+          label: "Why Choose BizForge?",
+          title: "THE SMART WAY TO<br><em>BUILD A BRAND</em>",
+          instant: { label: "Instant Results", text: "Complete brand kit in under 5 minutes with no design experience needed." },
+          ai: { label: "AI-Powered", text: "Groq AI, SDXL image generation, and IBM Granite working together." },
+          multilingual: { label: "Multilingual", text: "Full support for English, Spanish, French, German, and Hindi." },
+          domain: { label: "Domain Checker", text: "Automatic .com availability check for every name generated." },
+          professional: { label: "Professional Output", text: "Download full brand kits as JSON and generate complete websites." },
+          unlimited: { label: "Unlimited Regenerate", text: "Not happy with results? Regenerate with custom feedback anytime." },
+          theme: { label: "Light & Dark Mode", text: "One-click theme toggle for your preferred working environment." },
+          mobile: { label: "Mobile Ready", text: "All layout components scale fluidly for small and large screens." }
+        },
+        footer: {
+          copyright: "© 2025 <strong>BizForge</strong> — AI Brand Builder. All rights reserved.",
+          credits: "Powered by Groq AI · IBM Granite · SDXL · Speech Recognition"
+        },
+        progress: { start: "Getting Started" },
+        loading: { default: "Loading..." },
+        auth: {
+          eyebrow: "Welcome",
+          title: "SIGN IN TO <em>BizForge</em>",
+          subtitle: "Create your brand identity with AI — free, fast, and professional.",
+          username_label: "Username",
+          username_placeholder: "Enter your username",
+          password_label: "Password",
+          password_placeholder: "Enter your password",
+          signin: "Sign In",
+          create: "Create Account"
+        },
+        mode: {
+          eyebrow: "Step 1 — Choose Mode",
+          title: "WHAT DO YOU WANT TO <em>CREATE?</em>",
+          subtitle: "Select the type of brand assets you need",
+          full: "Full Brand Kit",
+          full_desc: "Complete brand identity + website",
+          name: "Brand Names",
+          name_desc: "Generate + check domain availability",
+          tagline: "Tagline Only",
+          tagline_desc: "Create powerful taglines",
+          logo: "Logo Only",
+          logo_desc: "Design your brand logo",
+          colors: "Color Palette",
+          colors_desc: "Generate brand colors",
+          domain: "Domain Checker",
+          domain_desc: "Check your brand's domain",
+          competitor: "Competitor Analysis",
+          competitor_desc: "Analyze competitor websites"
+        },
+        name: {
+          eyebrow: "Your Brand Name",
+          title: "ENTER YOUR <em>BRAND NAME</em>",
+          subtitle: "We need your brand name to get started",
+          label: "Brand Name",
+          placeholder: "e.g. Apple, Nike, Glowify"
+        },
+        intake: {
+          eyebrow: "Brand Setup",
+          title: "TELL US ABOUT<br><em>your brand</em>",
+          subtitle: "Answer these questions to build your brand assets",
+          q1: "What does your business do? *",
+          q1_placeholder: "e.g. We create sustainable fashion from recycled ocean plastics for eco-conscious consumers...",
+          q2: "Who is your target audience? *",
+          q2_placeholder: "e.g. Eco-conscious professionals aged 25-45 who care about sustainability...",
+          industry_label: "Select your industry *",
+          industry: {
+            tech: "💻 Technology",
+            fashion: "👗 Fashion",
+            food: "🍕 Food & Bev",
+            health: "🏥 Health",
+            finance: "💰 Finance",
+            education: "📚 Education",
+            realestate: "🏠 Real Estate",
+            entertainment: "🎬 Entertainment"
+          },
+          tone_label: "Select your brand tone *",
+          tone: {
+            professional: "💼 Professional",
+            playful: "🎉 Playful",
+            luxury: "👑 Luxury",
+            bold: "🔥 Bold",
+            minimal: "⚪ Minimal",
+            innovative: "🚀 Innovative",
+            friendly: "🤝 Friendly",
+            authoritative: "📊 Authoritative"
+          }
+        },
+        competitor: {
+          eyebrow: "Competitor Analysis",
+          title: "ANALYZE <em>COMPETITORS</em>",
+          subtitle: "Enter a competitor URL to analyze their brand strategy, keywords, colors, and CTAs",
+          url_label: "Competitor Website URL",
+          url_placeholder: "https://competitor.com",
+          analyze: "Analyze →"
+        },
+        domain: {
+          eyebrow: "Domain Availability",
+          title: "CHECK YOUR <em>DOMAIN</em>",
+          subtitle: "Enter one or more brand names to check if their .com domain is available",
+          label: "Brand Names to Check",
+          hint: "(comma-separated for multiple)",
+          placeholder: "e.g. Glowify, Lumena, Sparkr",
+          check: "Check →"
+        },
+        brandnames: {
+          eyebrow: "Brand Names",
+          title: "CHOOSE YOUR <em>brand name</em>",
+          subtitle: "AI generated 10 unique names — domain availability checked automatically",
+          feedback_label: "Not happy? Give feedback and regenerate:",
+          feedback_placeholder: "e.g. Make them shorter, more tech-focused, avoid hyphens..."
+        },
+        taglines: {
+          eyebrow: "Taglines",
+          title: "PICK YOUR <em>tagline</em>",
+          subtitle: "5 AI-generated taglines — click to select your favorite",
+          feedback_placeholder: "e.g. More emotional, shorter, include our product name..."
+        },
+        logo: {
+          style_eyebrow: "Logo Design — Step 1",
+          style_title: "CHOOSE YOUR <em>logo style</em>",
+          style_subtitle: "3 AI-generated style concepts — select one to generate your logo",
+          style_feedback: "e.g. More minimalist, use geometric shapes, darker colors...",
+          result_eyebrow: "Logo Design — Step 2",
+          result_title: "YOUR <em>logo</em> IS READY",
+          result_subtitle: "Your AI-generated logo concept"
+        },
+        colors: {
+          eyebrow: "Color Palette",
+          title: "CHOOSE YOUR <em>colors</em>",
+          subtitle: "AI-generated color palettes — click to select your brand colors",
+          feedback_placeholder: "e.g. More vibrant, earthy tones, avoid red..."
+        },
+        final: {
+          eyebrow: "Complete 🎉",
+          title: "YOUR <em>brand</em> IS READY",
+          subtitle: "Here's a summary of everything you've created",
+          brandname_label: "Brand Name",
+          tagline_label: "Tagline",
+          logo_label: "Logo Style",
+          colors_label: "Colors",
+          generate_website: "🚀 Generate My Website",
+          download_html: "⬇ Download HTML",
+          download_json: "📥 Download Brand Kit (JSON)",
+          create_another: "🔄 Create Another"
+        },
+        chat: {
+          subtitle: "Branding consultant · Always here",
+          greeting: "👋 Hi! I'm your BizForge branding consultant. Ask me anything about brand strategy, naming, marketing, or your current brand project!",
+          suggest1: "What makes a great brand name?",
+          suggest2: "Help me choose my brand tone",
+          suggest3: "Best colors for tech startups?",
+          input_placeholder: "Ask about branding..."
+        },
+        buttons: {
+          continue: "Continue →",
+          regenerate: "↺ Regenerate",
+          regenerate_styles: "↺ Regenerate Styles",
+          generate_logo: "Generate Logo →",
+          check_domains: "🌐 Check Domains",
+          back: "← Back to Tools",
+          back_styles: "← Back to Styles"
+        },
+        labels: {
+          selected: "Selected:",
+          style: "Style:",
+          option: "Option"
+        }
+      },
+      // Placeholder structure for other languages - to be filled with translations
+      hi: {
+        meta: { title: "बिज़फोर्ज — एआई ब्रांड बिल्डर" },
+        nav: { signout: "साइन आउट" },
+        hero: {
+          eyebrow: "✦ एआई-संचालित ब्रांड बिल्डर",
+          title: `अपनी <span class="gradient-text">ब्रांड पहचान</span> एआई के साथ बनाएं`,
+          subtitle: "ब्रांड नाम से लेकर लोगो, रंग पैलेट और मार्केटिंग कॉपी तक — मिनटों में अपना संपूर्ण ब्रांड बनाएं। डिज़ाइन कौशल की आवश्यकता नहीं।",
+          start: "🚀 मुफ्त में बनाना शुरू करें",
+          features: "विशेषताएं देखें ↓",
+          stats: {
+            tools: "एआई उपकरण",
+            languages: "भाषाएं",
+            time: "पूर्ण ब्रांड किट",
+            regenerations: "पुनर्जनन"
+          }
+        },
+        marquee: {
+          names: "ब्रांड नाम",
+          logo: "लोगो डिज़ाइन",
+          colors: "रंग पैलेट",
+          taglines: "टैगलाइन",
+          domain: "डोमेन चेकर",
+          competitor: "प्रतियोगी विश्लेषण",
+          marketing: "मार्केटिंग सामग्री",
+          chat: "एआई ब्रांडिंग चैट",
+          sentiment: "भावना विश्लेषण"
+        },
+        features: {
+          label: "आपको क्या मिलता है",
+          title: "लॉन्च करने के लिए हर उपकरण <em>चाहिए</em>",
+          names: { title: "ब्रांड नाम", desc: "एआई आपके स्वर और कीवर्ड के अनुरूप 10 अद्वितीय, उद्योग-विशिष्ट ब्रांड नाम विचार उत्पन्न करता है — त्वरित डोमेन उपलब्धता जांच के साथ।" },
+          logo: { title: "लोगो जनरेटर", desc: "एसडीएक्सएल छवि निर्माण का उपयोग करके 3 अलग-अलग शैलियों में कस्टम एआई लोगो अवधारणाएं प्राप्त करें।" },
+          marketing: { title: "मार्केटिंग सामग्री", desc: "सेकंडों में उत्पाद विवरण, सोशल पोस्ट, ईमेल अभियान और विज्ञापन कॉपी जेनरेट करें।" },
+          design: { title: "डिज़ाइन सिस्टम", desc: "प्रत्येक में 5 हेक्स कोड के साथ पेशेवर रूप से तैयार किए गए रंग पैलेट, टाइपोग्राफी सुझाव और आपके ब्रांड के लिए विज़ुअल स्टाइल गाइड।" },
+          domain: { title: "डोमेन चेकर", desc: "तुरंत जांचें कि आपके ब्रांड का .com डोमेन उपलब्ध है या नहीं।" },
+          competitor: { title: "प्रतियोगी विश्लेषण", desc: "किसी भी प्रतियोगी वेबसाइट का गहन एआई विश्लेषण — रंग रणनीति, संदेश शैली, सीटीए, कीवर्ड और स्थिति अंतराल।" },
+          chat: { title: "ब्रांडिंग चैट", desc: "एक एआई ब्रांडिंग सलाहकार के साथ चैट करें जिसके पास आपके ब्रांड का पूरा संदर्भ है और रणनीतिक, कार्रवाई योग्य सलाह देता है।" },
+          sentiment: { title: "भावना विश्लेषण", desc: "मूल्यांकन करें कि आपका ब्रांड संदेश आपके लक्षित दर्शकों के साथ भावनात्मक रूप से कैसे जुड़ता है।" }
+        },
+        why: {
+          label: "बिज़फोर्ज क्यों चुनें?",
+          title: "ब्रांड बनाने का <em>स्मार्ट तरीका</em>",
+          instant: { label: "त्वरित परिणाम", text: "बिना डिज़ाइन अनुभव के 5 मिनट से भी कम समय में पूर्ण ब्रांड किट।" },
+          ai: { label: "एआई-संचालित", text: "ग्रोक एआई, एसडीएक्सएल छवि निर्माण, और आईबीएम ग्रेनाइट एक साथ काम कर रहे हैं।" },
+          multilingual: { label: "बहुभाषी", text: "अंग्रेजी, हिंदी, तेलुगु, तमिल और स्पेनिश के लिए पूर्ण समर्थन।" },
+          domain: { label: "डोमेन चेकर", text: "जनरेट किए गए प्रत्येक नाम के लिए स्वचालित .com उपलब्धता जांच।" },
+          professional: { label: "पेशेवर आउटपुट", text: "पूर्ण ब्रांड किट JSON के रूप में डाउनलोड करें और संपूर्ण वेबसाइट जेनरेट करें।" },
+          unlimited: { label: "असीमित पुनर्जनन", text: "परिणामों से खुश नहीं हैं? कभी भी कस्टम फीडबैक के साथ पुनः जेनरेट करें।" },
+          theme: { label: "लाइट और डार्क मोड", text: "आपके पसंदीदा कार्य वातावरण के लिए एक-क्लिक थीम टॉगल।" },
+          mobile: { label: "मोबाइल रेडी", text: "सभी लेआउट घटक छोटे और बड़े स्क्रीन के लिए तरल रूप से स्केल करते हैं।" }
+        },
+        footer: {
+          copyright: "© 2025 <strong>बिज़फोर्ज</strong> — एआई ब्रांड बिल्डर। सर्वाधिकार सुरक्षित।",
+          credits: "ग्रोक एआई · आईबीएम ग्रेनाइट · एसडीएक्सएल · स्पीच रिकग्निशन द्वारा संचालित"
+        },
+        progress: { start: "शुरू करना" },
+        loading: { default: "लोड हो रहा है..." },
+        auth: {
+          eyebrow: "स्वागत है",
+          title: "<em>बिज़फोर्ज</em> में साइन इन करें",
+          subtitle: "एआई के साथ अपनी ब्रांड पहचान बनाएं — मुफ्त, तेज और पेशेवर।",
+          username_label: "उपयोगकर्ता नाम",
+          username_placeholder: "अपना उपयोगकर्ता नाम दर्ज करें",
+          password_label: "पासवर्ड",
+          password_placeholder: "अपना पासवर्ड दर्ज करें",
+          signin: "साइन इन करें",
+          create: "खाता बनाएं"
+        },
+        mode: {
+          eyebrow: "चरण 1 — मोड चुनें",
+          title: "आप <em>क्या बनाना</em> चाहते हैं?",
+          subtitle: "आपको आवश्यक ब्रांड एसेट्स का प्रकार चुनें",
+          full: "पूर्ण ब्रांड किट",
+          full_desc: "संपूर्ण ब्रांड पहचान + वेबसाइट",
+          name: "ब्रांड नाम",
+          name_desc: "जनरेट करें + डोमेन उपलब्धता जांचें",
+          tagline: "केवल टैगलाइन",
+          tagline_desc: "शक्तिशाली टैगलाइन बनाएं",
+          logo: "केवल लोगो",
+          logo_desc: "अपना ब्रांड लोगो डिज़ाइन करें",
+          colors: "रंग पैलेट",
+          colors_desc: "ब्रांड रंग जनरेट करें",
+          domain: "डोमेन चेकर",
+          domain_desc: "अपने ब्रांड का डोमेन जांचें",
+          competitor: "प्रतियोगी विश्लेषण",
+          competitor_desc: "प्रतियोगी वेबसाइटों का विश्लेषण करें"
+        },
+        name: {
+          eyebrow: "आपका ब्रांड नाम",
+          title: "अपना <em>ब्रांड नाम</em> दर्ज करें",
+          subtitle: "शुरू करने के लिए हमें आपके ब्रांड नाम की आवश्यकता है",
+          label: "ब्रांड नाम",
+          placeholder: "जैसे ऐप्पल, नाइकी, ग्लोइफाई"
+        },
+        intake: {
+          eyebrow: "ब्रांड सेटअप",
+          title: "हमें अपने <em>ब्रांड</em> के बारे में बताएं",
+          subtitle: "अपने ब्रांड एसेट्स बनाने के लिए इन प्रश्नों के उत्तर दें",
+          q1: "आपका व्यवसाय क्या करता है? *",
+          q1_placeholder: "जैसे हम पर्यावरण के प्रति जागरूक उपभोक्ताओं के लिए रिसाइकिल्ड समुद्री प्लास्टिक से टिकाऊ फैशन बनाते हैं...",
+          q2: "आपका लक्षित दर्शक कौन है? *",
+          q2_placeholder: "जैसे 25-45 वर्ष के पर्यावरण के प्रति जागरूक पेशेवर जो स्थिरता की परवाह करते हैं...",
+          industry_label: "अपना उद्योग चुनें *",
+          industry: {
+            tech: "💻 प्रौद्योगिकी",
+            fashion: "👗 फैशन",
+            food: "🍕 खाद्य और पेय",
+            health: "🏥 स्वास्थ्य",
+            finance: "💰 वित्त",
+            education: "📚 शिक्षा",
+            realestate: "🏠 रियल एस्टेट",
+            entertainment: "🎬 मनोरंजन"
+          },
+          tone_label: "अपना ब्रांड स्वर चुनें *",
+          tone: {
+            professional: "💼 पेशेवर",
+            playful: "🎉 चंचल",
+            luxury: "👑 लक्जरी",
+            bold: "🔥 बोल्ड",
+            minimal: "⚪ न्यूनतम",
+            innovative: "🚀 नवीन",
+            friendly: "🤝 मैत्रीपूर्ण",
+            authoritative: "📊 आधिकारिक"
+          }
+        },
+        competitor: {
+          eyebrow: "प्रतियोगी विश्लेषण",
+          title: "<em>प्रतियोगियों</em> का विश्लेषण करें",
+          subtitle: "उनकी ब्रांड रणनीति, कीवर्ड, रंग और सीटीए का विश्लेषण करने के लिए एक प्रतियोगी यूआरएल दर्ज करें",
+          url_label: "प्रतियोगी वेबसाइट यूआरएल",
+          url_placeholder: "https://competitor.com",
+          analyze: "विश्लेषण करें →"
+        },
+        domain: {
+          eyebrow: "डोमेन उपलब्धता",
+          title: "अपना <em>डोमेन</em> जांचें",
+          subtitle: "यह जांचने के लिए एक या अधिक ब्रांड नाम दर्ज करें कि उनका .com डोमेन उपलब्ध है या नहीं",
+          label: "जांचने के लिए ब्रांड नाम",
+          hint: "(एकाधिक के लिए अल्पविराम-पृथक)",
+          placeholder: "जैसे ग्लोइफाई, ल्यूमेना, स्पार्कर",
+          check: "जांचें →"
+        },
+        brandnames: {
+          eyebrow: "ब्रांड नाम",
+          title: "अपना <em>ब्रांड नाम</em> चुनें",
+          subtitle: "एआई ने 10 अद्वितीय नाम जनरेट किए — डोमेन उपलब्धता स्वचालित रूप से जांची गई",
+          feedback_label: "खुश नहीं हैं? फीडबैक दें और पुनः जनरेट करें:",
+          feedback_placeholder: "जैसे उन्हें छोटा करें, अधिक टेक-फोकस्ड बनाएं, हाइफ़न से बचें..."
+        },
+        taglines: {
+          eyebrow: "टैगलाइन",
+          title: "अपनी <em>टैगलाइन</em> चुनें",
+          subtitle: "5 एआई-जनरेटेड टैगलाइन — अपनी पसंदीदा चुनने के लिए क्लिक करें",
+          feedback_placeholder: "जैसे अधिक भावनात्मक, छोटा, हमारे उत्पाद का नाम शामिल करें..."
+        },
+        logo: {
+          style_eyebrow: "लोगो डिज़ाइन — चरण 1",
+          style_title: "अपनी <em>लोगो शैली</em> चुनें",
+          style_subtitle: "3 एआई-जनरेटेड शैली अवधारणाएं — अपना लोगो जनरेट करने के लिए एक चुनें",
+          style_feedback: "जैसे अधिक न्यूनतम, ज्यामितीय आकार का उपयोग करें, गहरे रंग...",
+          result_eyebrow: "लोगो डिज़ाइन — चरण 2",
+          result_title: "आपका <em>लोगो</em> तैयार है",
+          result_subtitle: "आपकी एआई-जनरेटेड लोगो अवधारणा"
+        },
+        colors: {
+          eyebrow: "रंग पैलेट",
+          title: "अपने <em>रंग</em> चुनें",
+          subtitle: "एआई-जनरेटेड रंग पैलेट — अपने ब्रांड रंग चुनने के लिए क्लिक करें",
+          feedback_placeholder: "जैसे अधिक जीवंत, मिट्टी के रंग, लाल से बचें..."
+        },
+        final: {
+          eyebrow: "पूर्ण 🎉",
+          title: "आपका <em>ब्रांड</em> तैयार है",
+          subtitle: "यहां आपके द्वारा बनाई गई हर चीज का सारांश है",
+          brandname_label: "ब्रांड नाम",
+          tagline_label: "टैगलाइन",
+          logo_label: "लोगो शैली",
+          colors_label: "रंग",
+          generate_website: "🚀 मेरी वेबसाइट जनरेट करें",
+          download_html: "⬇ एचटीएमएल डाउनलोड करें",
+          download_json: "📥 ब्रांड किट डाउनलोड करें (JSON)",
+          create_another: "🔄 दूसरा बनाएं"
+        },
+        chat: {
+          subtitle: "ब्रांडिंग सलाहकार · हमेशा उपलब्ध",
+          greeting: "👋 नमस्ते! मैं आपका बिज़फोर्ज ब्रांडिंग सलाहकार हूं। ब्रांड रणनीति, नामकरण, मार्केटिंग या आपके वर्तमान ब्रांड प्रोजेक्ट के बारे में कुछ भी पूछें!",
+          suggest1: "एक महान ब्रांड नाम क्या बनाता है?",
+          suggest2: "मेरा ब्रांड स्वर चुनने में मदद करें",
+          suggest3: "टेक स्टार्टअप के लिए सर्वोत्तम रंग?",
+          input_placeholder: "ब्रांडिंग के बारे में पूछें..."
+        },
+        buttons: {
+          continue: "जारी रखें →",
+          regenerate: "↺ पुनः जनरेट करें",
+          regenerate_styles: "↺ शैलियाँ पुनः जनरेट करें",
+          generate_logo: "लोगो जनरेट करें →",
+          check_domains: "🌐 डोमेन जांचें",
+          back: "← उपकरणों पर वापस जाएं",
+          back_styles: "← शैलियों पर वापस जाएं"
+        },
+        labels: {
+          selected: "चयनित:",
+          style: "शैली:",
+          option: "विकल्प"
+        }
+      },
+      te: {
+        // Telugu translations placeholder
+        meta: { title: "బిజ్ఫోర్జ్ — AI బ్రాండ్ బిల్డర్" },
+        nav: { signout: "సైన్ అవుట్" },
+        hero: {
+          eyebrow: "✦ AI-ఆధారిత బ్రాండ్ బిల్డర్",
+          title: `మీ <span class="gradient-text">బ్రాండ్ గుర్తింపు</span>ను AIతో నిర్మించండి`,
+          subtitle: "బ్రాండ్ పేర్ల నుండి లోగోలు, కలర్ ప్యాలెట్లు మరియు మార్కెటింగ్ కాపీ వరకు — నిమిషాల్లో మీ సంపూర్ణ బ్రాండ్‌ను సృష్టించండి. డిజైన్ నైపుణ్యాలు అవసరం లేదు.",
+          start: "🚀 ఉచితంగా నిర్మించడం ప్రారంభించండి",
+          features: "ఫీచర్లు చూడండి ↓",
+          stats: {
+            tools: "AI సాధనాలు",
+            languages: "భాషలు",
+            time: "పూర్తి బ్రాండ్ కిట్",
+            regenerations: "పునరుత్పాదనలు"
+          }
+        },
+        marquee: {
+          names: "బ్రాండ్ పేర్లు",
+          logo: "లోగో డిజైన్",
+          colors: "కలర్ ప్యాలెట్లు",
+          taglines: "ట్యాగ్‌లైన్‌లు",
+          domain: "డొమైన్ చెకర్",
+          competitor: "పోటీదారు విశ్లేషణ",
+          marketing: "మార్కెటింగ్ కంటెంట్",
+          chat: "AI బ్రాండింగ్ చాట్",
+          sentiment: "సెంటిమెంట్ విశ్లేషణ"
+        },
+        features: {
+          label: "మీకు ఏమి లభిస్తుంది",
+          title: "లాంచ్ చేయడానికి అవసరమైన ప్రతి సాధనం <em></em>",
+          names: { title: "బ్రాండ్ పేర్లు", desc: "AI మీ టోన్ మరియు కీవర్డ్‌లకు అనుగుణంగా 10 ప్రత్యేకమైన, పరిశ్రమ-నిర్దిష్ట బ్రాండ్ పేరు ఆలోచనలను రూపొందిస్తుంది — తక్షణ డొమైన్ లభ్యత తనిఖీతో." },
+          logo: { title: "లోగో జనరేటర్", desc: "SDXL ఇమేజ్ జనరేషన్ ఉపయోగించి 3 విభిన్న శైలులలో కస్టమ్ AI లోగో కాన్సెప్ట్‌లను పొందండి." },
+          marketing: { title: "మార్కెటింగ్ కంటెంట్", desc: "సెకన్లలో ఉత్పత్తి వివరణలు, సోషల్ పోస్ట్‌లు, ఇమెయిల్ ప్రచారాలు మరియు ప్రకటన కాపీని రూపొందించండి." },
+          design: { title: "డిజైన్ సిస్టమ్", desc: "ప్రతి ఒక్కటి 5 హెక్స్ కోడ్‌లతో వృత్తిపరంగా నిర్వహించబడిన కలర్ ప్యాలెట్‌లు, టైపోగ్రఫీ సూచనలు మరియు మీ బ్రాండ్ కోసం విజువల్ స్టైల్ గైడ్‌లు." },
+          domain: { title: "డొమైన్ చెకర్", desc: "మీ బ్రాండ్ యొక్క .com డొమైన్ అందుబాటులో ఉందో లేదో తక్షణమే తనిఖీ చేయండి." },
+          competitor: { title: "పోటీదారు విశ్లేషణ", desc: "ఏదైనా పోటీదారు వెబ్‌సైట్ యొక్క లోతైన AI విశ్లేషణ — కలర్ వ్యూహం, మెసేజింగ్ శైలి, CTAలు, కీవర్డ్‌లు మరియు పొజిషనింగ్ ఖాళీలు." },
+          chat: { title: "బ్రాండింగ్ చాట్", desc: "మీ బ్రాండ్ యొక్క పూర్తి సందర్భం కలిగిన AI బ్రాండింగ్ కన్సల్టెంట్‌తో చాట్ చేయండి." },
+          sentiment: { title: "సెంటిమెంట్ విశ్లేషణ", desc: "మీ బ్రాండ్ సందేశం మీ లక్ష్య ప్రేక్షకులతో భావోద్వేగపరంగా ఎలా ప్రతిధ్వనిస్తుందో మూల్యాంకనం చేయండి." }
+        },
+        why: {
+          label: "బిజ్ఫోర్జ్ ఎందుకు ఎంచుకోవాలి?",
+          title: "బ్రాండ్‌ను నిర్మించడానికి <em>స్మార్ట్ మార్గం</em>",
+          instant: { label: "తక్షణ ఫలితాలు", text: "డిజైన్ అనుభవం లేకుండా 5 నిమిషాల లోపు పూర్తి బ్రాండ్ కిట్." },
+          ai: { label: "AI-ఆధారిత", text: "గ్రోక్ AI, SDXL ఇమేజ్ జనరేషన్ మరియు IBM గ్రానైట్ కలిసి పనిచేస్తున్నాయి." },
+          multilingual: { label: "బహుభాషా", text: "ఆంగ్లం, తెలుగు, హిందీ, తమిళం మరియు స్పానిష్ కోసం పూర్తి మద్దతు." },
+          domain: { label: "డొమైన్ చెకర్", text: "రూపొందించిన ప్రతి పేరు కోసం స్వయంచాలక .com లభ్యత తనిఖీ." },
+          professional: { label: "ప్రొఫెషనల్ అవుట్‌పుట్", text: "పూర్తి బ్రాండ్ కిట్‌లను JSON గా డౌన్‌లోడ్ చేసుకోండి మరియు పూర్తి వెబ్‌సైట్‌లను రూపొందించండి." },
+          unlimited: { label: "అపరిమిత పునరుత్పాదన", text: "ఫలితాలతో సంతోషంగా లేరా? ఎప్పుడైనా కస్టమ్ ఫీడ్‌బ్యాక్‌తో మళ్లీ రూపొందించండి." },
+          theme: { label: "లైట్ & డార్క్ మోడ్", text: "మీ ప్రాధాన్య పని వాతావరణం కోసం ఒకే-క్లిక్ థీమ్ టోగుల్." },
+          mobile: { label: "మొబైల్ రెడీ", text: "అన్ని లేఅవుట్ కాంపోనెంట్‌లు చిన్న మరియు పెద్ద స్క్రీన్‌ల కోసం ద్రవంగా స్కేల్ అవుతాయి." }
+        },
+        footer: {
+          copyright: "© 2025 <strong>బిజ్ఫోర్జ్</strong> — AI బ్రాండ్ బిల్డర్. అన్ని హక్కులు రిజర్వ్ చేయబడ్డాయి.",
+          credits: "గ్రోక్ AI · IBM గ్రానైట్ · SDXL · స్పీచ్ రికగ్నిషన్ ద్వారా ఆధారితం"
+        },
+        progress: { start: "ప్రారంభిస్తున్నాము" },
+        loading: { default: "లోడ్ అవుతోంది..." },
+        auth: {
+          eyebrow: "స్వాగతం",
+          title: "<em>బిజ్ఫోర్జ్</em>లో సైన్ ఇన్ చేయండి",
+          subtitle: "AIతో మీ బ్రాండ్ గుర్తింపును సృష్టించండి — ఉచితంగా, వేగంగా మరియు వృత్తిపరంగా.",
+          username_label: "యూజర్‌నేమ్",
+          username_placeholder: "మీ యూజర్‌నేమ్ నమోదు చేయండి",
+          password_label: "పాస్‌వర్డ్",
+          password_placeholder: "మీ పాస్‌వర్డ్ నమోదు చేయండి",
+          signin: "సైన్ ఇన్ చేయండి",
+          create: "ఖాతా సృష్టించండి"
+        },
+        mode: {
+          eyebrow: "దశ 1 — మోడ్ ఎంచుకోండి",
+          title: "మీరు <em>ఏమి సృష్టించాలనుకుంటున్నారు?</em>",
+          subtitle: "మీకు అవసరమైన బ్రాండ్ ఆస్తుల రకాన్ని ఎంచుకోండి",
+          full: "పూర్తి బ్రాండ్ కిట్",
+          full_desc: "సంపూర్ణ బ్రాండ్ గుర్తింపు + వెబ్‌సైట్",
+          name: "బ్రాండ్ పేర్లు",
+          name_desc: "రూపొందించండి + డొమైన్ లభ్యత తనిఖీ చేయండి",
+          tagline: "ట్యాగ్‌లైన్ మాత్రమే",
+          tagline_desc: "శక్తివంతమైన ట్యాగ్‌లైన్‌లను సృష్టించండి",
+          logo: "లోగో మాత్రమే",
+          logo_desc: "మీ బ్రాండ్ లోగోను డిజైన్ చేయండి",
+          colors: "కలర్ ప్యాలెట్",
+          colors_desc: "బ్రాండ్ రంగులను రూపొందించండి",
+          domain: "డొమైన్ చెకర్",
+          domain_desc: "మీ బ్రాండ్ యొక్క డొమైన్ తనిఖీ చేయండి",
+          competitor: "పోటీదారు విశ్లేషణ",
+          competitor_desc: "పోటీదారు వెబ్‌సైట్‌లను విశ్లేషించండి"
+        },
+        name: {
+          eyebrow: "మీ బ్రాండ్ పేరు",
+          title: "మీ <em>బ్రాండ్ పేరు</em> నమోదు చేయండి",
+          subtitle: "ప్రారంభించడానికి మాకు మీ బ్రాండ్ పేరు అవసరం",
+          label: "బ్రాండ్ పేరు",
+          placeholder: "ఉదా. ఆపిల్, నైకీ, గ్లోఫై"
+        },
+        intake: {
+          eyebrow: "బ్రాండ్ సెటప్",
+          title: "మీ <em>బ్రాండ్</em> గురించి మాకు చెప్పండి",
+          subtitle: "మీ బ్రాండ్ ఆస్తులను నిర్మించడానికి ఈ ప్రశ్నలకు సమాధానం ఇవ్వండి",
+          q1: "మీ వ్యాపారం ఏమి చేస్తుంది? *",
+          q1_placeholder: "ఉదా. పర్యావరణ స్పృహ ఉన్న వినియోగదారుల కోసం రీసైకిల్ చేసిన సముద్ర ప్లాస్టిక్‌ల నుండి స్థిరమైన ఫ్యాషన్‌ను మేము సృష్టిస్తాము...",
+          q2: "మీ లక్ష్య ప్రేక్షకులు ఎవరు? *",
+          q2_placeholder: "ఉదా. సుస్థిరత పట్ల శ్రద్ధ వహించే 25-45 ఏళ్ల పర్యావరణ స్పృహ ఉన్న నిపుణులు...",
+          industry_label: "మీ పరిశ్రమను ఎంచుకోండి *",
+          industry: {
+            tech: "💻 టెక్నాలజీ",
+            fashion: "👗 ఫ్యాషన్",
+            food: "🍕 ఫుడ్ & బెవరేజ్",
+            health: "🏥 హెల్త్",
+            finance: "💰 ఫైనాన్స్",
+            education: "📚 ఎడ్యుకేషన్",
+            realestate: "🏠 రియల్ ఎస్టేట్",
+            entertainment: "🎬 ఎంటర్టైన్‌మెంట్"
+          },
+          tone_label: "మీ బ్రాండ్ టోన్‌ను ఎంచుకోండి *",
+          tone: {
+            professional: "💼 ప్రొఫెషనల్",
+            playful: "🎉 ప్లేఫుల్",
+            luxury: "👑 లగ్జరీ",
+            bold: "🔥 బోల్డ్",
+            minimal: "⚪ మినిమల్",
+            innovative: "🚀 ఇన్నోవేటివ్",
+            friendly: "🤝 ఫ్రెండ్లీ",
+            authoritative: "📊 అథారిటేటివ్"
+          }
+        },
+        competitor: {
+          eyebrow: "పోటీదారు విశ్లేషణ",
+          title: "<em>పోటీదారులను</em> విశ్లేషించండి",
+          subtitle: "వారి బ్రాండ్ వ్యూహం, కీవర్డ్‌లు, రంగులు మరియు CTAలను విశ్లేషించడానికి పోటీదారు URLని నమోదు చేయండి",
+          url_label: "పోటీదారు వెబ్‌సైట్ URL",
+          url_placeholder: "https://competitor.com",
+          analyze: "విశ్లేషించండి →"
+        },
+        domain: {
+          eyebrow: "డొమైన్ లభ్యత",
+          title: "మీ <em>డొమైన్</em> తనిఖీ చేయండి",
+          subtitle: "వాటి .com డొమైన్ అందుబాటులో ఉందో లేదో తనిఖీ చేయడానికి ఒకటి లేదా అంతకంటే ఎక్కువ బ్రాండ్ పేర్లను నమోదు చేయండి",
+          label: "తనిఖీ చేయడానికి బ్రాండ్ పేర్లు",
+          hint: "(బహుళ కోసం కామా-వేరు చేయబడినవి)",
+          placeholder: "ఉదా. గ్లోఫై, ల్యూమినా, స్పార్కర్",
+          check: "తనిఖీ చేయండి →"
+        },
+        brandnames: {
+          eyebrow: "బ్రాండ్ పేర్లు",
+          title: "మీ <em>బ్రాండ్ పేరు</em> ఎంచుకోండి",
+          subtitle: "AI 10 ప్రత్యేకమైన పేర్లను రూపొందించింది — డొమైన్ లభ్యత స్వయంచాలకంగా తనిఖీ చేయబడింది",
+          feedback_label: "సంతోషంగా లేదా? ఫీడ్‌బ్యాక్ ఇవ్వండి మరియు మళ్లీ రూపొందించండి:",
+          feedback_placeholder: "ఉదా. వాటిని చిన్నవిగా చేయండి, మరింత టెక్-ఫోకస్ చేయండి, హైఫన్‌లను నివారించండి..."
+        },
+        taglines: {
+          eyebrow: "ట్యాగ్‌లైన్‌లు",
+          title: "మీ <em>ట్యాగ్‌లైన్</em> ఎంచుకోండి",
+          subtitle: "5 AI-రూపొందించిన ట్యాగ్‌లైన్‌లు — మీకు ఇష్టమైనదాన్ని ఎంచుకోవడానికి క్లిక్ చేయండి",
+          feedback_placeholder: "ఉదా. మరింత భావోద్వేగ, చిన్నది, మా ఉత్పత్తి పేరును చేర్చండి..."
+        },
+        logo: {
+          style_eyebrow: "లోగో డిజైన్ — దశ 1",
+          style_title: "మీ <em>లోగో శైలిని</em> ఎంచుకోండి",
+          style_subtitle: "3 AI-రూపొందించిన శైలి అవగాహనలు — మీ లోగోను రూపొందించడానికి ఒకదాన్ని ఎంచుకోండి",
+          style_feedback: "ఉదా. మరింత మినిమలిస్ట్, జ్యామితీయ ఆకారాలను ఉపయోగించండి, ముదురు రంగులు...",
+          result_eyebrow: "లోగో డిజైన్ — దశ 2",
+          result_title: "మీ <em>లోగో</em> సిద్ధంగా ఉంది",
+          result_subtitle: "మీ AI-రూపొందించిన లోగో అవగాహన"
+        },
+        colors: {
+          eyebrow: "కలర్ ప్యాలెట్",
+          title: "మీ <em>రంగులను</em> ఎంచుకోండి",
+          subtitle: "AI-రూపొందించిన కలర్ ప్యాలెట్‌లు — మీ బ్రాండ్ రంగులను ఎంచుకోవడానికి క్లిక్ చేయండి",
+          feedback_placeholder: "ఉదా. మరింత శక్తివంతమైన, ఎర్త్ టోన్‌లు, ఎరుపును నివారించండి..."
+        },
+        final: {
+          eyebrow: "పూర్తయింది 🎉",
+          title: "మీ <em>బ్రాండ్</em> సిద్ధంగా ఉంది",
+          subtitle: "మీరు సృష్టించిన ప్రతిదాని యొక్క సారాంశం ఇక్కడ ఉంది",
+          brandname_label: "బ్రాండ్ పేరు",
+          tagline_label: "ట్యాగ్‌లైన్",
+          logo_label: "లోగో శైలి",
+          colors_label: "రంగులు",
+          generate_website: "🚀 నా వెబ్‌సైట్‌ను రూపొందించండి",
+          download_html: "⬇ HTML డౌన్‌లోడ్ చేయండి",
+          download_json: "📥 బ్రాండ్ కిట్ డౌన్‌లోడ్ చేయండి (JSON)",
+          create_another: "🔄 మరొకటి సృష్టించండి"
+        },
+        chat: {
+          subtitle: "బ్రాండింగ్ కన్సల్టెంట్ · ఎల్లప్పుడూ అందుబాటులో",
+          greeting: "👋 హాయ్! నేను మీ బిజ్ఫోర్జ్ బ్రాండింగ్ కన్సల్టెంట్‌ను. బ్రాండ్ వ్యూహం, నామకరణం, మార్కెటింగ్ లేదా మీ ప్రస్తుత బ్రాండ్ ప్రాజెక్ట్ గురించి ఏదైనా అడగండి!",
+          suggest1: "గొప్ప బ్రాండ్ పేరును ఏది చేస్తుంది?",
+          suggest2: "నా బ్రాండ్ టోన్ ఎంచుకోవడంలో సహాయపడండి",
+          suggest3: "టెక్ స్టార్టప్‌లకు ఉత్తమ రంగులు?",
+          input_placeholder: "బ్రాండింగ్ గురించి అడగండి..."
+        },
+        buttons: {
+          continue: "కొనసాగించు →",
+          regenerate: "↺ మళ్లీ రూపొందించు",
+          regenerate_styles: "↺ శైలులను మళ్లీ రూపొందించు",
+          generate_logo: "లోగో రూపొందించు →",
+          check_domains: "🌐 డొమైన్‌లను తనిఖీ చేయండి",
+          back: "← టూల్స్‌కు తిరిగి వెళ్ళు",
+          back_styles: "← శైలులకు తిరిగి వెళ్ళు"
+        },
+        labels: {
+          selected: "ఎంచుకున్నది:",
+          style: "శైలి:",
+          option: "ఎంపిక"
+        }
+      },
+      ta: {
+        // Tamil translations placeholder
+        meta: { title: "பிஸ்ஃபோர்ஜ் — AI பிராண்ட் பில்டர்" },
+        nav: { signout: "வெளியேறு" },
+        hero: {
+          eyebrow: "✦ AI-இயங்கும் பிராண்ட் பில்டர்",
+          title: `உங்கள் <span class="gradient-text">பிராண்ட் அடையாளத்தை</span> AI உடன் உருவாக்குங்கள்`,
+          subtitle: "பிராண்ட் பெயர்கள் முதல் லோகோக்கள், வண்ணத் தட்டுகள் மற்றும் மார்க்கெட்டிங் நகல் வரை — நிமிடங்களில் உங்கள் முழுமையான பிராண்டை உருவாக்குங்கள். வடிவமைப்பு திறன்கள் தேவையில்லை.",
+          start: "🚀 இலவசமாக உருவாக்கத் தொடங்குங்கள்",
+          features: "அம்சங்களைக் காண்க ↓",
+          stats: {
+            tools: "AI கருவிகள்",
+            languages: "மொழிகள்",
+            time: "முழு பிராண்ட் கிட்",
+            regenerations: "மறுஉருவாக்கங்கள்"
+          }
+        },
+        marquee: {
+          names: "பிராண்ட் பெயர்கள்",
+          logo: "லோகோ வடிவமைப்பு",
+          colors: "வண்ணத் தட்டுகள்",
+          taglines: "டேக்லைன்கள்",
+          domain: "டொமைன் சரிபார்ப்பு",
+          competitor: "போட்டியாளர் பகுப்பாய்வு",
+          marketing: "மார்க்கெட்டிங் உள்ளடக்கம்",
+          chat: "AI பிராண்டிங் அரட்டை",
+          sentiment: "உணர்வு பகுப்பாய்வு"
+        },
+        features: {
+          label: "உங்களுக்குக் கிடைப்பது",
+          title: "தொடங்குவதற்கு தேவையான ஒவ்வொரு கருவியும் <em></em>",
+          names: { title: "பிராண்ட் பெயர்கள்", desc: "AI உங்கள் தொனி மற்றும் முக்கிய வார்த்தைகளுக்கு ஏற்றவாறு 10 தனித்துவமான, தொழில்-குறிப்பிட்ட பிராண்ட் பெயர் யோசனைகளை உருவாக்குகிறது — உடனடி டொமைன் கிடைக்கும் தன்மை சரிபார்ப்புடன்." },
+          logo: { title: "லோகோ ஜெனரேட்டர்", desc: "SDXL பட உருவாக்கத்தைப் பயன்படுத்தி 3 தனித்துவமான பாணிகளில் தனிப்பயன் AI லோகோ கருத்துக்களைப் பெறுங்கள்." },
+          marketing: { title: "மார்க்கெட்டிங் உள்ளடக்கம்", desc: "வினாடிகளில் தயாரிப்பு விளக்கங்கள், சமூகப் பதிவுகள், மின்னஞ்சல் பிரச்சாரங்கள் மற்றும் விளம்பர நகல்களை உருவாக்குங்கள்." },
+          design: { title: "வடிவமைப்பு அமைப்பு", desc: "ஒவ்வொன்றும் 5 ஹெக்ஸ் குறியீடுகளுடன் தொழில் ரீதியாக வடிவமைக்கப்பட்ட வண்ணத் தட்டுகள், எழுத்துரு பரிந்துரைகள் மற்றும் உங்கள் பிராண்டிற்கான காட்சி பாணி வழிகாட்டிகள்." },
+          domain: { title: "டொமைன் சரிபார்ப்பு", desc: "உங்கள் பிராண்டின் .com டொமைன் கிடைக்கிறதா என்பதை உடனடியாகச் சரிபார்க்கவும்." },
+          competitor: { title: "போட்டியாளர் பகுப்பாய்வு", desc: "எந்தவொரு போட்டியாளர் வலைத்தளத்தின் ஆழமான AI பகுப்பாய்வு — வண்ண உத்தி, செய்தி அனுப்பும் பாணி, CTAக்கள், முக்கிய வார்த்தைகள் மற்றும் நிலைப்படுத்தல் இடைவெளிகள்." },
+          chat: { title: "பிராண்டிங் அரட்டை", desc: "உங்கள் பிராண்டின் முழு சூழலையும் கொண்ட AI பிராண்டிங் ஆலோசகரிடம் அரட்டையடித்து, மூலோபாய, செயல்படக்கூடிய ஆலோசனைகளைப் பெறுங்கள்." },
+          sentiment: { title: "உணர்வு பகுப்பாய்வு", desc: "உங்கள் பிராண்ட் செய்தி உங்கள் இலக்கு பார்வையாளர்களுடன் உணர்வுபூர்வமாக எவ்வாறு எதிரொலிக்கிறது என்பதை மதிப்பீடு செய்யுங்கள்." }
+        },
+        why: {
+          label: "ஏன் பிஸ்ஃபோர்ஜை தேர்வு செய்ய வேண்டும்?",
+          title: "பிராண்டை உருவாக்குவதற்கான <em>புத்திசாலித்தனமான வழி</em>",
+          instant: { label: "உடனடி முடிவுகள்", text: "வடிவமைப்பு அனுபவமின்றி 5 நிமிடங்களுக்குள் முழுமையான பிராண்ட் கிட்." },
+          ai: { label: "AI-இயங்கும்", text: "க்ரோக் AI, SDXL பட உருவாக்கம் மற்றும் IBM கிரானைட் ஒன்றாக வேலை செய்கின்றன." },
+          multilingual: { label: "பல மொழி", text: "ஆங்கிலம், தமிழ், ஹிந்தி, தெலுங்கு மற்றும் ஸ்பானிஷ் மொழிகளுக்கு முழு ஆதரவு." },
+          domain: { label: "டொமைன் சரிபார்ப்பு", text: "உருவாக்கப்பட்ட ஒவ்வொரு பெயருக்கும் தானியங்கி .com கிடைக்கும் தன்மை சரிபார்ப்பு." },
+          professional: { label: "தொழில்முறை வெளியீடு", text: "முழு பிராண்ட் கிட்களை JSON ஆக பதிவிறக்கி, முழுமையான வலைத்தளங்களை உருவாக்குங்கள்." },
+          unlimited: { label: "வரம்பற்ற மறுஉருவாக்கம்", text: "முடிவுகளில் மகிழ்ச்சியில்லையா? எந்த நேரத்திலும் தனிப்பயன் கருத்துடன் மீண்டும் உருவாக்குங்கள்." },
+          theme: { label: "லைட் & டார்க் மோட்", text: "உங்கள் விருப்பமான வேலை சூழலுக்கு ஒரே-கிளிக் தீம் மாற்று." },
+          mobile: { label: "மொபைல் ரெடி", text: "அனைத்து லேஅவுட் கூறுகளும் சிறிய மற்றும் பெரிய திரைகளுக்கு திரவமாக அளவிடப்படுகின்றன." }
+        },
+        footer: {
+          copyright: "© 2025 <strong>பிஸ்ஃபோர்ஜ்</strong> — AI பிராண்ட் பில்டர். அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.",
+          credits: "க்ரோக் AI · IBM கிரானைட் · SDXL · ஸ்பீச் ரெகக்னிஷன் மூலம் இயக்கப்படுகிறது"
+        },
+        progress: { start: "தொடங்குகிறது" },
+        loading: { default: "ஏற்றப்படுகிறது..." },
+        auth: {
+          eyebrow: "வரவேற்கிறோம்",
+          title: "<em>பிஸ்ஃபோர்ஜில்</em> உள்நுழைக",
+          subtitle: "AI உடன் உங்கள் பிராண்ட் அடையாளத்தை உருவாக்குங்கள் — இலவசம், வேகமானது மற்றும் தொழில்முறை.",
+          username_label: "பயனர்பெயர்",
+          username_placeholder: "உங்கள் பயனர்பெயரை உள்ளிடவும்",
+          password_label: "கடவுச்சொல்",
+          password_placeholder: "உங்கள் கடவுச்சொல்லை உள்ளிடவும்",
+          signin: "உள்நுழைக",
+          create: "கணக்கை உருவாக்கு"
+        },
+        mode: {
+          eyebrow: "படி 1 — முறையைத் தேர்வு செய்யவும்",
+          title: "நீங்கள் <em>எதை உருவாக்க விரும்புகிறீர்கள்?</em>",
+          subtitle: "உங்களுக்குத் தேவையான பிராண்ட் சொத்துகளின் வகையைத் தேர்ந்தெடுக்கவும்",
+          full: "முழு பிராண்ட் கிட்",
+          full_desc: "முழுமையான பிராண்ட் அடையாளம் + வலைத்தளம்",
+          name: "பிராண்ட் பெயர்கள்",
+          name_desc: "உருவாக்கு + டொமைன் கிடைக்கும் தன்மையை சரிபார்",
+          tagline: "டேக்லைன் மட்டும்",
+          tagline_desc: "சக்திவாய்ந்த டேக்லைன்களை உருவாக்குங்கள்",
+          logo: "லோகோ மட்டும்",
+          logo_desc: "உங்கள் பிராண்ட் லோகோவை வடிவமைக்கவும்",
+          colors: "வண்ணத் தட்டு",
+          colors_desc: "பிராண்ட் வண்ணங்களை உருவாக்குங்கள்",
+          domain: "டொமைன் சரிபார்ப்பு",
+          domain_desc: "உங்கள் பிராண்டின் டொமைனை சரிபார்க்கவும்",
+          competitor: "போட்டியாளர் பகுப்பாய்வு",
+          competitor_desc: "போட்டியாளர் வலைத்தளங்களை பகுப்பாய்வு செய்யுங்கள்"
+        },
+        name: {
+          eyebrow: "உங்கள் பிராண்ட் பெயர்",
+          title: "உங்கள் <em>பிராண்ட் பெயரை</em> உள்ளிடவும்",
+          subtitle: "தொடங்க உங்கள் பிராண்ட் பெயர் எங்களுக்குத் தேவை",
+          label: "பிராண்ட் பெயர்",
+          placeholder: "எ.கா. ஆப்பிள், நைக்கி, குளோஃபை"
+        },
+        intake: {
+          eyebrow: "பிராண்ட் அமைப்பு",
+          title: "உங்கள் <em>பிராண்ட்</em> பற்றி எங்களிடம் கூறுங்கள்",
+          subtitle: "உங்கள் பிராண்ட் சொத்துகளை உருவாக்க இந்தக் கேள்விகளுக்குப் பதிலளிக்கவும்",
+          q1: "உங்கள் வணிகம் என்ன செய்கிறது? *",
+          q1_placeholder: "எ.கா. சுற்றுச்சூழல் உணர்வுள்ள நுகர்வோருக்கு மறுசுழற்சி செய்யப்பட்ட கடல் பிளாஸ்டிக்கிலிருந்து நிலையான ஃபேஷனை உருவாக்குகிறோம்...",
+          q2: "உங்கள் இலக்கு பார்வையாளர்கள் யார்? *",
+          q2_placeholder: "எ.கா. நிலைத்தன்மையைப் பற்றி அக்கறை கொண்ட 25-45 வயதுடைய சுற்றுச்சூழல் உணர்வுள்ள நிபுணர்கள்...",
+          industry_label: "உங்கள் தொழிலைத் தேர்ந்தெடுக்கவும் *",
+          industry: {
+            tech: "💻 தொழில்நுட்பம்",
+            fashion: "👗 ஃபேஷன்",
+            food: "🍕 உணவு மற்றும் பானம்",
+            health: "🏥 சுகாதாரம்",
+            finance: "💰 நிதி",
+            education: "📚 கல்வி",
+            realestate: "🏠 ரியல் எஸ்டேட்",
+            entertainment: "🎬 பொழுதுபோக்கு"
+          },
+          tone_label: "உங்கள் பிராண்ட் தொனியைத் தேர்ந்தெடுக்கவும் *",
+          tone: {
+            professional: "💼 தொழில்முறை",
+            playful: "🎉 விளையாட்டுத்தனமான",
+            luxury: "👑 ஆடம்பரம்",
+            bold: "🔥 துணிச்சலான",
+            minimal: "⚪ குறைந்தபட்ச",
+            innovative: "🚀 புதுமையான",
+            friendly: "🤝 நட்பான",
+            authoritative: "📊 அதிகாரப்பூர்வமான"
+          }
+        },
+        competitor: {
+          eyebrow: "போட்டியாளர் பகுப்பாய்வு",
+          title: "<em>போட்டியாளர்களை</em> பகுப்பாய்வு செய்யுங்கள்",
+          subtitle: "அவர்களின் பிராண்ட் உத்தி, முக்கிய வார்த்தைகள், வண்ணங்கள் மற்றும் CTAக்களை பகுப்பாய்வு செய்ய போட்டியாளர் URL ஐ உள்ளிடவும்",
+          url_label: "போட்டியாளர் வலைத்தள URL",
+          url_placeholder: "https://competitor.com",
+          analyze: "பகுப்பாய்வு செய் →"
+        },
+        domain: {
+          eyebrow: "டொமைன் கிடைக்கும் தன்மை",
+          title: "உங்கள் <em>டொமைனை</em> சரிபார்க்கவும்",
+          subtitle: "அவற்றின் .com டொமைன் கிடைக்கிறதா என்பதைச் சரிபார்க்க ஒன்று அல்லது அதற்கு மேற்பட்ட பிராண்ட் பெயர்களை உள்ளிடவும்",
+          label: "சரிபார்க்க பிராண்ட் பெயர்கள்",
+          hint: "(பலவற்றிற்கு காற்புள்ளியால் பிரிக்கப்பட்டவை)",
+          placeholder: "எ.கா. குளோஃபை, லூமினா, ஸ்பார்கர்",
+          check: "சரிபார் →"
+        },
+        brandnames: {
+          eyebrow: "பிராண்ட் பெயர்கள்",
+          title: "உங்கள் <em>பிராண்ட் பெயரை</em> தேர்வு செய்யவும்",
+          subtitle: "AI 10 தனித்துவமான பெயர்களை உருவாக்கியது — டொமைன் கிடைக்கும் தன்மை தானாக சரிபார்க்கப்பட்டது",
+          feedback_label: "மகிழ்ச்சியில்லையா? கருத்து தெரிவித்து மீண்டும் உருவாக்குங்கள்:",
+          feedback_placeholder: "எ.கா. அவற்றைச் சுருக்கமாக்குங்கள், மேலும் டெக்-ஃபோகஸ் செய்யுங்கள், ஹைஃபன்களைத் தவிர்க்கவும்..."
+        },
+        taglines: {
+          eyebrow: "டேக்லைன்கள்",
+          title: "உங்கள் <em>டேக்லைனை</em> தேர்வு செய்யவும்",
+          subtitle: "5 AI-உருவாக்கிய டேக்லைன்கள் — உங்களுக்குப் பிடித்ததைத் தேர்ந்தெடுக்க கிளிக் செய்யவும்",
+          feedback_placeholder: "எ.கா. மேலும் உணர்வுபூர்வமான, சுருக்கமான, எங்கள் தயாரிப்பு பெயரைச் சேர்க்கவும்..."
+        },
+        logo: {
+          style_eyebrow: "லோகோ வடிவமைப்பு — படி 1",
+          style_title: "உங்கள் <em>லோகோ பாணியை</em> தேர்வு செய்யவும்",
+          style_subtitle: "3 AI-உருவாக்கிய பாணி கருத்துக்கள் — உங்கள் லோகோவை உருவாக்க ஒன்றைத் தேர்ந்தெடுக்கவும்",
+          style_feedback: "எ.கா. மேலும் குறைந்தபட்ச, வடிவியல் வடிவங்களைப் பயன்படுத்துங்கள், இarkர் வண்ணங்கள்...",
+          result_eyebrow: "லோகோ வடிவமைப்பு — படி 2",
+          result_title: "உங்கள் <em>லோகோ</em> தயாராக உள்ளது",
+          result_subtitle: "உங்கள் AI-உருவாக்கிய லோகோ கருத்து"
+        },
+        colors: {
+          eyebrow: "வண்ணத் தட்டு",
+          title: "உங்கள் <em>வண்ணங்களை</em> தேர்வு செய்யவும்",
+          subtitle: "AI-உருவாக்கிய வண்ணத் தட்டுகள் — உங்கள் பிராண்ட் வண்ணங்களைத் தேர்ந்தெடுக்க கிளிக் செய்யவும்",
+          feedback_placeholder: "எ.கா. மேலும் துடிப்பான, மண் தொனிகள், சிவப்பைத் தவிர்க்கவும்..."
+        },
+        final: {
+          eyebrow: "முடிந்தது 🎉",
+          title: "உங்கள் <em>பிராண்ட்</em> தயாராக உள்ளது",
+          subtitle: "நீங்கள் உருவாக்கிய அனைத்தின் சுருக்கம் இங்கே",
+          brandname_label: "பிராண்ட் பெயர்",
+          tagline_label: "டேக்லைன்",
+          logo_label: "லோகோ பாணி",
+          colors_label: "வண்ணங்கள்",
+          generate_website: "🚀 எனது வலைத்தளத்தை உருவாக்கு",
+          download_html: "⬇ HTML ஐப் பதிவிறக்கு",
+          download_json: "📥 பிராண்ட் கிட்டைப் பதிவிறக்கு (JSON)",
+          create_another: "🔄 மற்றொன்றை உருவாக்கு"
+        },
+        chat: {
+          subtitle: "பிராண்டிங் ஆலோசகர் · எப்போதும் இங்கே",
+          greeting: "👋 வணக்கம்! நான் உங்கள் பிஸ்ஃபோர்ஜ் பிராண்டிங் ஆலோசகர். பிராண்ட் உத்தி, பெயரிடுதல், மார்க்கெட்டிங் அல்லது உங்கள் தற்போதைய பிராண்ட் திட்டம் பற்றி எதுவும் கேளுங்கள்!",
+          suggest1: "ஒரு சிறந்த பிராண்ட் பெயரை எது உருவாக்குகிறது?",
+          suggest2: "எனது பிராண்ட் தொனியைத் தேர்வுசெய்ய உதவுங்கள்",
+          suggest3: "டெக் ஸ்டார்டப்களுக்கான சிறந்த வண்ணங்கள்?",
+          input_placeholder: "பிராண்டிங் பற்றி கேளுங்கள்..."
+        },
+        buttons: {
+          continue: "தொடரவும் →",
+          regenerate: "↺ மீண்டும் உருவாக்கு",
+          regenerate_styles: "↺ பாணிகளை மீண்டும் உருவாக்கு",
+          generate_logo: "லோகோவை உருவாக்கு →",
+          check_domains: "🌐 டொமைன்களை சரிபார்",
+          back: "← கருவிகளுக்குத் திரும்பு",
+          back_styles: "← பாணிகளுக்குத் திரும்பு"
+        },
+        labels: {
+          selected: "தேர்ந்தெடுக்கப்பட்டது:",
+          style: "பாணி:",
+          option: "விருப்பம்"
+        }
+      },
+      es: {
+        // Spanish translations placeholder
+        meta: { title: "BizForge — Creador de Marcas con IA" },
+        nav: { signout: "Cerrar Sesión" },
+        hero: {
+          eyebrow: "✦ Creador de Marcas con IA",
+          title: `CONSTRUYE TU<br><span class="gradient-text">IDENTIDAD DE MARCA</span><br>CON IA`,
+          subtitle: "Desde nombres de marca hasta logotipos, paletas de colores y copias de marketing: crea tu marca completa en minutos. Sin necesidad de habilidades de diseño.",
+          start: "🚀 Comienza a Crear Gratis",
+          features: "Ver Características ↓",
+          stats: {
+            tools: "Herramientas IA",
+            languages: "Idiomas",
+            time: "Kit de Marca Completo",
+            regenerations: "Regeneraciones"
+          }
+        },
+        marquee: {
+          names: "Nombres de Marca",
+          logo: "Diseño de Logotipo",
+          colors: "Paletas de Colores",
+          taglines: "Eslogans",
+          domain: "Verificador de Dominio",
+          competitor: "Análisis de Competencia",
+          marketing: "Contenido de Marketing",
+          chat: "Chat de Marca IA",
+          sentiment: "Análisis de Sentimiento"
+        },
+        features: {
+          label: "Lo Que Obtienes",
+          title: "TODAS LAS HERRAMIENTAS PARA <em>LANZAR</em>",
+          names: { title: "Nombres de Marca", desc: "IA genera 10 ideas de nombres únicos y específicos de la industria, adaptados a tu tono y palabras clave, con verificación instantánea de disponibilidad de dominio." },
+          logo: { title: "Generador de Logotipos", desc: "Obtén conceptos de logotipos personalizados con IA en 3 estilos distintos: Minimalista, Audaz y Elegante, utilizando generación de imágenes SDXL." },
+          marketing: { title: "Contenido de Marketing", desc: "Genera descripciones de productos, publicaciones sociales, campañas de correo electrónico y copias publicitarias en segundos, perfectamente alineadas con la voz de tu marca." },
+          design: { title: "Sistema de Diseño", desc: "Paletas de colores seleccionadas profesionalmente con 5 códigos HEX cada una, sugerencias tipográficas y guías de estilo visual para tu marca." },
+          domain: { title: "Verificador de Dominio", desc: "Verifica al instante si el dominio .com de tu marca está disponible. Se ejecuta automáticamente en todos los nombres generados para que elijas el ganador." },
+          competitor: { title: "Análisis de Competencia", desc: "Análisis profundo con IA de cualquier sitio web de la competencia: estrategia de color, estilo de mensajería, CTAs, palabras clave y brechas de posicionamiento." },
+          chat: { title: "Chat de Marca", desc: "Chatea con un consultor de marca IA que tiene contexto completo de tu marca y brinda consejos estratégicos y procesables." },
+          sentiment: { title: "Análisis de Sentimiento", desc: "Evalúa cómo resuena emocionalmente tu mensaje de marca con tu audiencia objetivo: Positivo, Neutral o Negativo con puntuaciones de confianza." }
+        },
+        why: {
+          label: "¿Por qué Elegir BizForge?",
+          title: "LA FORMA INTELIGENTE DE<br><em>CONSTRUIR UNA MARCA</em>",
+          instant: { label: "Resultados Instantáneos", text: "Kit de marca completo en menos de 5 minutos sin necesidad de experiencia en diseño." },
+          ai: { label: "Impulsado por IA", text: "Groq AI, generación de imágenes SDXL e IBM Granite trabajando juntos." },
+          multilingual: { label: "Multilingüe", text: "Soporte completo para inglés, español, francés, alemán e hindi." },
+          domain: { label: "Verificador de Dominio", text: "Verificación automática de disponibilidad .com para cada nombre generado." },
+          professional: { label: "Salida Profesional", text: "Descarga kits de marca completos como JSON y genera sitios web completos." },
+          unlimited: { label: "Regeneración Ilimitada", text: "¿No estás satisfecho con los resultados? Regenera con comentarios personalizados en cualquier momento." },
+          theme: { label: "Modo Claro y Oscuro", text: "Alternancia de tema con un clic para tu entorno de trabajo preferido." },
+          mobile: { label: "Listo para Móviles", text: "Todos los componentes del diseño se escalan fluidamente para pantallas pequeñas y grandes." }
+        },
+        footer: {
+          copyright: "© 2025 <strong>BizForge</strong> — Creador de Marcas con IA. Todos los derechos reservados.",
+          credits: "Impulsado por Groq AI · IBM Granite · SDXL · Reconocimiento de Voz"
+        },
+        progress: { start: "Comenzando" },
+        loading: { default: "Cargando..." },
+        auth: {
+          eyebrow: "Bienvenido",
+          title: "INICIA SESIÓN EN <em>BizForge</em>",
+          subtitle: "Crea tu identidad de marca con IA — gratis, rápido y profesional.",
+          username_label: "Nombre de Usuario",
+          username_placeholder: "Ingresa tu nombre de usuario",
+          password_label: "Contraseña",
+          password_placeholder: "Ingresa tu contraseña",
+          signin: "Iniciar Sesión",
+          create: "Crear Cuenta"
+        },
+        mode: {
+          eyebrow: "Paso 1 — Elige el Modo",
+          title: "¿QUÉ QUIERES <em>CREAR?</em>",
+          subtitle: "Selecciona el tipo de activos de marca que necesitas",
+          full: "Kit de Marca Completo",
+          full_desc: "Identidad de marca completa + sitio web",
+          name: "Nombres de Marca",
+          name_desc: "Genera + verifica disponibilidad de dominio",
+          tagline: "Solo Eslogan",
+          tagline_desc: "Crea eslogans poderosos",
+          logo: "Solo Logotipo",
+          logo_desc: "Diseña el logotipo de tu marca",
+          colors: "Paleta de Colores",
+          colors_desc: "Genera colores de marca",
+          domain: "Verificador de Dominio",
+          domain_desc: "Verifica el dominio de tu marca",
+          competitor: "Análisis de Competencia",
+          competitor_desc: "Analiza sitios web de la competencia"
+        },
+        name: {
+          eyebrow: "Tu Nombre de Marca",
+          title: "INGRESA TU <em>NOMBRE DE MARCA</em>",
+          subtitle: "Necesitamos el nombre de tu marca para comenzar",
+          label: "Nombre de Marca",
+          placeholder: "ej. Apple, Nike, Glowify"
+        },
+        intake: {
+          eyebrow: "Configuración de Marca",
+          title: "CUÉNTANOS SOBRE<br><em>tu marca</em>",
+          subtitle: "Responde estas preguntas para construir los activos de tu marca",
+          q1: "¿Qué hace tu negocio? *",
+          q1_placeholder: "ej. Creamos moda sostenible a partir de plásticos oceánicos reciclados para consumidores conscientes del medio ambiente...",
+          q2: "¿Quién es tu audiencia objetivo? *",
+          q2_placeholder: "ej. Profesionales conscientes del medio ambiente de 25-45 años que se preocupan por la sostenibilidad...",
+          industry_label: "Selecciona tu industria *",
+          industry: {
+            tech: "💻 Tecnología",
+            fashion: "👗 Moda",
+            food: "🍕 Alimentos y Bebidas",
+            health: "🏥 Salud",
+            finance: "💰 Finanzas",
+            education: "📚 Educación",
+            realestate: "🏠 Bienes Raíces",
+            entertainment: "🎬 Entretenimiento"
+          },
+          tone_label: "Selecciona el tono de tu marca *",
+          tone: {
+            professional: "💼 Profesional",
+            playful: "🎉 Juguetón",
+            luxury: "👑 Lujo",
+            bold: "🔥 Audaz",
+            minimal: "⚪ Minimalista",
+            innovative: "🚀 Innovador",
+            friendly: "🤝 Amigable",
+            authoritative: "📊 Autoritario"
+          }
+        },
+        competitor: {
+          eyebrow: "Análisis de Competencia",
+          title: "ANALIZA <em>COMPETIDORES</em>",
+          subtitle: "Ingresa la URL de un competidor para analizar su estrategia de marca, palabras clave, colores y CTAs",
+          url_label: "URL del Sitio Web del Competidor",
+          url_placeholder: "https://competitor.com",
+          analyze: "Analizar →"
+        },
+        domain: {
+          eyebrow: "Disponibilidad de Dominio",
+          title: "VERIFICA TU <em>DOMINIO</em>",
+          subtitle: "Ingresa uno o más nombres de marca para verificar si su dominio .com está disponible",
+          label: "Nombres de Marca a Verificar",
+          hint: "(separados por comas para múltiples)",
+          placeholder: "ej. Glowify, Lumena, Sparkr",
+          check: "Verificar →"
+        },
+        brandnames: {
+          eyebrow: "Nombres de Marca",
+          title: "ELIGE TU <em>nombre de marca</em>",
+          subtitle: "IA generó 10 nombres únicos — disponibilidad de dominio verificada automáticamente",
+          feedback_label: "¿No estás satisfecho? Da tu opinión y regenera:",
+          feedback_placeholder: "ej. Hazlos más cortos, más enfocados en tecnología, evita guiones..."
+        },
+        taglines: {
+          eyebrow: "Eslogans",
+          title: "ELIGE TU <em>eslogan</em>",
+          subtitle: "5 eslogans generados por IA — haz clic para seleccionar tu favorito",
+          feedback_placeholder: "ej. Más emocional, más corto, incluye nuestro nombre de producto..."
+        },
+        logo: {
+          style_eyebrow: "Diseño de Logotipo — Paso 1",
+          style_title: "ELIGE TU <em>estilo de logotipo</em>",
+          style_subtitle: "3 conceptos de estilo generados por IA — selecciona uno para generar tu logotipo",
+          style_feedback: "ej. Más minimalista, usa formas geométricas, colores más oscuros...",
+          result_eyebrow: "Diseño de Logotipo — Paso 2",
+          result_title: "TU <em>logotipo</em> ESTÁ LISTO",
+          result_subtitle: "Tu concepto de logotipo generado por IA"
+        },
+        colors: {
+          eyebrow: "Paleta de Colores",
+          title: "ELIGE TUS <em>colores</em>",
+          subtitle: "Paletas de colores generadas por IA — haz clic para seleccionar los colores de tu marca",
+          feedback_placeholder: "ej. Más vibrantes, tonos tierra, evita el rojo..."
+        },
+        final: {
+          eyebrow: "Completado 🎉",
+          title: "TU <em>marca</em> ESTÁ LISTA",
+          subtitle: "Aquí hay un resumen de todo lo que has creado",
+          brandname_label: "Nombre de Marca",
+          tagline_label: "Eslogan",
+          logo_label: "Estilo de Logotipo",
+          colors_label: "Colores",
+          generate_website: "🚀 Generar Mi Sitio Web",
+          download_html: "⬇ Descargar HTML",
+          download_json: "📥 Descargar Kit de Marca (JSON)",
+          create_another: "🔄 Crear Otra"
+        },
+        chat: {
+          subtitle: "Consultor de Marca · Siempre aquí",
+          greeting: "👋 ¡Hola! Soy tu consultor de marca de BizForge. ¡Pregúntame cualquier cosa sobre estrategia de marca, nombres, marketing o tu proyecto de marca actual!",
+          suggest1: "¿Qué hace que un nombre de marca sea excelente?",
+          suggest2: "Ayúdame a elegir el tono de mi marca",
+          suggest3: "¿Mejores colores para startups tecnológicas?",
+          input_placeholder: "Pregunta sobre branding..."
+        },
+        buttons: {
+          continue: "Continuar →",
+          regenerate: "↺ Regenerar",
+          regenerate_styles: "↺ Regenerar Estilos",
+          generate_logo: "Generar Logotipo →",
+          check_domains: "🌐 Verificar Dominios",
+          back: "← Volver a Herramientas",
+          back_styles: "← Volver a Estilos"
+        },
+        labels: {
+          selected: "Seleccionado:",
+          style: "Estilo:",
+          option: "Opción"
+        }
+      }
+    };
+
+    let currentLang = 'en';
+
+    function getTranslation(lang, key) {
+      return key.split('.').reduce((obj, i) => obj ? obj[i] : null, I18N[lang]);
+    }
+
+    function translatePage(lang) {
+      // Text content with HTML support
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const value = getTranslation(lang, key);
+        if (value) el.innerHTML = value;
+      });
+
+      // Placeholder attributes
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        const value = getTranslation(lang, key);
+        if (value) el.setAttribute('placeholder', value);
+      });
+
+      // Title tag
+      const titleKey = document.querySelector('title')?.getAttribute('data-i18n');
+      if (titleKey) {
+        const value = getTranslation(lang, titleKey);
+        if (value) document.title = value;
+      }
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('bf_lang', lang);
+      translatePage(lang);
+    }
+
+    // ==================== END I18N SYSTEM ====================
+
+    const API = 'http://localhost:8000';
+    let currentUser = null;
+    let currentSection = 'auth';
+    let brandState = {
+      name: null, tagline: null,
+      logo: { style: null, prompt: null, image: null },
+      colors: null, mode: null, sessionId: null,
+      industry: null, tone: null
+    };
+    let logoStyles = [];
+    let pendingMode = null;
+    let generatedNames = []; // track all names for domain checking
+
+    // ─── PAGE SYSTEM ───
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+    function goToApp(section) { showPage('app'); showSection(section); }
+    function handleLogoClick() {
+      if (currentUser) { goToApp('mode'); } else { showPage('landing'); }
+    }
+
+    // ─── SECTION SYSTEM ───
+    function showSection(id) {
+      document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
+      const el = document.getElementById('sec-' + id);
+      if (el) el.classList.add('active');
+      currentSection = id;
+      const stepNames = {
+        auth:'', mode:'Select Mode', intake:'Setup', 'name-input':'Enter Name',
+        competitor:'Analysis', domain:'Domain Check', brandnames:'Names',
+        taglines:'Taglines', 'logo-style':'Logo Style', 'logo-result':'Logo',
+        colors:'Colors', final:'Complete',
+        sentiment:'Sentiment', 'product-desc':'Product Desc',
+        'social-post':'Social Post', 'email-gen':'Email'
+      };
+      const lbl = stepNames[id] || '';
+      const ns = document.getElementById('nav-step');
+      ns.textContent = lbl; ns.style.display = lbl ? 'inline-block' : 'none';
+      updateProgress();
+      window.scrollTo(0, 0);
+      // Ensure translations are applied to dynamic content
+      translatePage(currentLang);
+    }
+
+    function updateProgress() {
+      const steps = ['intake','brandnames','taglines','logo-style','logo-result','colors','final'];
+      const idx = steps.indexOf(currentSection);
+      if (idx >= 0) {
+        const pct = Math.round((idx / (steps.length - 1)) * 100);
+        document.getElementById('progress-fill').style.width = pct + '%';
+        document.getElementById('progress-percent').textContent = pct + '%';
+      }
+      const ml = { full:'Full Brand Kit', name:'Brand Names', tagline:'Tagline', logo:'Logo', colors:'Colors', domain:'Domain Checker', competitor:'Competitor Analysis' };
+      if (ml[brandState.mode]) document.getElementById('progress-label').textContent = ml[brandState.mode];
+    }
+
+    function showAlert(msg, type='error') {
+      const el = document.getElementById('alert');
+      document.getElementById('alert-text').textContent = msg;
+      el.className = 'alert show' + (type === 'success' ? ' success' : '');
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.classList.remove('show'), 4500);
+    }
+    function showLoading(txt) { document.getElementById('loading-text').textContent = txt || 'Loading...'; document.getElementById('loading').classList.add('show'); }
+    function hideLoading() { document.getElementById('loading').classList.remove('show'); }
+
+    // ─── THEME ───
+    function toggleTheme() {
+      document.body.classList.toggle('light-mode');
+      const isLight = document.body.classList.contains('light-mode');
+      document.getElementById('theme-toggle').textContent = isLight ? '🌙' : '☀️';
+      localStorage.setItem('bf_theme', isLight ? 'light' : 'dark');
+    }
+
+    // ─── AUTH ───
+    function handleLogout() {
+      localStorage.removeItem('bf_auth');
+      currentUser = null;
+      document.getElementById('nav-username').style.display = 'none';
+      document.getElementById('logout-btn').style.display = 'none';
+      showPage('landing');
+    }
+
+    async function handleLogin() {
+      const u = document.getElementById('login-username').value.trim();
+      const p = document.getElementById('login-password').value.trim();
+      if (!u || !p) { showAlert('Please enter username and password'); return; }
+      showLoading('Signing in...');
+      try {
+        const r = await fetch(API + '/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p}) });
+        const d = await r.json();
+        if (d.error) { showAlert(d.error); }
+        else {
+          localStorage.setItem('bf_auth', u + ':' + d.session_id);
+          currentUser = u + ':' + d.session_id;
+          document.getElementById('nav-username').textContent = u;
+          document.getElementById('nav-username').style.display = 'inline';
+          document.getElementById('logout-btn').style.display = 'inline-flex';
+          goToApp('mode');
+        }
+      } catch { showAlert('Cannot connect to server. Is the backend running?'); }
+      hideLoading();
+    }
+
+    async function handleRegister() {
+      const u = document.getElementById('login-username').value.trim();
+      const p = document.getElementById('login-password').value.trim();
+      if (!u || !p) { showAlert('Please enter username and password'); return; }
+      showLoading('Creating account...');
+      try {
+        const r = await fetch(API + '/api/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p}) });
+        const d = await r.json();
+        if (d.error) { showAlert(d.error); }
+        else { showAlert('Account created! Please sign in.', 'success'); }
+      } catch { showAlert('Cannot connect to server. Is the backend running?'); }
+      hideLoading();
+    }
+
+    // ─── MODE SELECTION ───
+    function selectMode(mode) {
+      brandState.mode = mode;
+      if (mode === 'competitor') {
+        showSection('competitor');
+      } else if (mode === 'domain') {
+        showSection('domain');
+      } else if (mode === 'sentiment') {
+        showSection('sentiment');
+      } else if (mode === 'product-desc') {
+        showSection('product-desc');
+      } else if (mode === 'social-post') {
+        showSection('social-post');
+      } else if (mode === 'email-gen') {
+        showSection('email-gen');
+      } else if (mode === 'full') {
+        document.getElementById('intake-subtitle').setAttribute('data-i18n', 'intake.subtitle');
+        document.getElementById('intake-subtitle').innerHTML = getTranslation(currentLang, 'intake.subtitle');
+        showSection('intake');
+      } else {
+        pendingMode = mode;
+        const subtitles = { name:'name.subtitle', tagline:'name.subtitle', logo:'name.subtitle', colors:'name.subtitle' };
+        document.getElementById('name-input-subtitle').setAttribute('data-i18n', subtitles[mode]);
+        document.getElementById('name-input-subtitle').innerHTML = getTranslation(currentLang, subtitles[mode]);
+        showSection('name-input');
+      }
+      translatePage(currentLang);
+    }
+
+    function proceedToIntake() {
+      const n = document.getElementById('manual-brand-name').value.trim();
+      if (!n) { showAlert('Please enter a brand name'); return; }
+      brandState.name = n;
+      const s = { name:'intake.subtitle', tagline:'intake.subtitle', logo:'intake.subtitle', colors:'intake.subtitle' };
+      document.getElementById('intake-subtitle').setAttribute('data-i18n', s[pendingMode]);
+      document.getElementById('intake-subtitle').innerHTML = getTranslation(currentLang, s[pendingMode]);
+      showSection('intake');
+      translatePage(currentLang);
+    }
+
+    // ─── INTAKE ───
+    document.getElementById('intake-q1').addEventListener('input', function () { document.getElementById('q1-count').textContent = this.value.length; });
+    document.getElementById('intake-q2').addEventListener('input', function () { document.getElementById('q2-count').textContent = this.value.length; });
+
+    function selectOption(el, type, value) {
+      const grid = type === 'industry' ? '#industry-grid' : '#tone-grid';
+      document.querySelectorAll(grid + ' .option-card').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      if (type === 'industry') brandState.industry = value;
+      else brandState.tone = value;
+    }
+
+    async function handleIntake() {
+      const q1 = document.getElementById('intake-q1').value.trim();
+      const q2 = document.getElementById('intake-q2').value.trim();
+      if (!q1 || q1.length < 10) { showAlert('Please describe your business (min 10 characters)'); return; }
+      if (!q2 || q2.length < 10) { showAlert('Please describe your target audience (min 10 characters)'); return; }
+      if (!brandState.industry) { showAlert('Please select an industry'); return; }
+      if (!brandState.tone) { showAlert('Please select a brand tone'); return; }
+      showLoading('Creating your brand session...');
+      try {
+        const r = await fetch(API + '/api/intake', {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':currentUser},
+          body:JSON.stringify({ answers:{ q1, q2, q3:brandState.industry, q4:brandState.tone }, language: currentLang })
+        });
+        const d = await r.json();
+        if (d.error) { showAlert(d.error); hideLoading(); return; }
+        brandState.sessionId = d.session_id;
+
+        // For non-full modes, pre-generate a brand name
+        if (brandState.mode !== 'full') {
+          const nr = await fetch(API + '/api/generate-brand', {
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':currentUser},
+            body:JSON.stringify({ retry: false, language: currentLang })
+          });
+          const nd = await nr.json();
+          if (!nd.error && nd.brand_names) {
+            // Only use first generated name if no name was manually entered
+            if (!brandState.name) brandState.name = nd.brand_names[0];
+          }
+        }
+
+        if (brandState.mode === 'full' || brandState.mode === 'name') { showSection('brandnames'); generateBrandNames(); }
+        else if (brandState.mode === 'tagline') { showSection('taglines'); generateTaglines(); }
+        else if (brandState.mode === 'logo') { showSection('logo-style'); generateLogoStyles(); }
+        else if (brandState.mode === 'colors') { showSection('colors'); generateColors(); }
+      } catch { showAlert('Failed to create session. Please try again.'); }
+      hideLoading();
+    }
+
+    // ─── COMPETITOR ANALYSIS ───
+    async function analyzeCompetitor() {
+      const url = document.getElementById('competitor-url').value.trim();
+      if (!url) { showAlert('Please enter a URL'); return; }
+      if (!url.startsWith('http')) { showAlert('Please include https:// in the URL'); return; }
+      showLoading('Analyzing competitor website...');
+      try {
+        const r = await fetch(API + '/api/analyze-competitor', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ url, language: currentLang })
+        });
+        const d = await r.json();
+        const el = document.getElementById('competitor-results');
+        el.classList.remove('hidden');
+        if (d.strategic_analysis) {
+          el.textContent = '═══ STRATEGIC ANALYSIS ═══\n\n' + d.strategic_analysis +
+            '\n\n═══ RAW DATA ═══\n\n' + JSON.stringify(d.structured_data, null, 2);
+        } else {
+          el.textContent = JSON.stringify(d, null, 2);
+        }
+      } catch { showAlert('Analysis failed. Check the URL and try again.'); }
+      hideLoading();
+    }
+
+    // ─── DOMAIN CHECKER (standalone) ───
+    async function checkDomains() {
+      const raw = document.getElementById('domain-check-input').value.trim();
+      if (!raw) { showAlert('Please enter at least one brand name'); return; }
+      const names = raw.split(',').map(n => n.trim()).filter(Boolean);
+      if (names.length === 0) { showAlert('Please enter valid brand names'); return; }
+      showLoading('Checking domain availability...');
+      const container = document.getElementById('domain-check-results');
+      container.innerHTML = '';
+      try {
+        const r = await fetch(API + '/api/check-domain-availability', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ names, language: currentLang })
+        });
+        const d = await r.json();
+        d.results.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'domain-result-item';
+          div.innerHTML = `
+            <div>
+              <div class="domain-result-name">${item.name}</div>
+              <div class="domain-result-url">🌐 ${item.domain}</div>
+            </div>
+            <div class="domain-status ${item.available ? 'avail' : 'taken'}">
+              ${item.available ? '✅ Available' : '❌ Taken'}
+            </div>`;
+          container.appendChild(div);
+        });
+      } catch { showAlert('Domain check failed. Is the backend running?'); }
+      hideLoading();
+    }
+
+    // ─── BRAND NAMES ───
+    async function generateBrandNames(feedback = '') {
+      showLoading('Generating brand names...');
+      try {
+        const r = await fetch(API + '/api/generate-brand', {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':currentUser},
+          body:JSON.stringify({ retry: !!feedback, feedback: feedback || undefined, language: currentLang })
+        });
+        const d = await r.json();
+        if (d.error) { showAlert(d.error); }
+        else {
+          generatedNames = d.brand_names || [];
+          renderBrandNames(generatedNames);
+          // Auto-check domains after rendering
+          autoCheckDomains(generatedNames);
+        }
+      } catch { showAlert('Failed to generate names. Please try again.'); }
+      hideLoading();
+    }
+
+    function renderBrandNames(names) {
+      const g = document.getElementById('brandnames-grid');
+      g.innerHTML = '';
+      names.forEach((name, i) => {
+        const c = document.createElement('div');
+        c.className = 'card';
+        c.dataset.name = name;
+        const optionLabel = getTranslation(currentLang, 'labels.option') || 'Option';
+        c.innerHTML = `
+          <div class="selected-badge">✓ Selected</div>
+          <div class="card-number">${optionLabel} ${String(i + 1).padStart(2, '0')}</div>
+          <div class="card-title">${name}</div>
+          <div class="domain-badge checking" id="domain-${i}">⏳ Checking .com...</div>`;
+        c.onclick = () => {
+          document.querySelectorAll('#brandnames-grid .card').forEach(x => x.classList.remove('selected'));
+          c.classList.add('selected');
+          brandState.name = name;
+          document.getElementById('brandnames-preview').textContent = name;
+          document.getElementById('brandnames-next').disabled = false;
+          document.getElementById('check-domains-btn').style.display = 'inline-flex';
+        };
+        g.appendChild(c);
+      });
+      translatePage(currentLang);
+    }
+
+    async function autoCheckDomains(names) {
+      try {
+        const r = await fetch(API + '/api/check-domain-availability', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ names, language: currentLang })
+        });
+        const d = await r.json();
+        d.results.forEach((item, i) => {
+          const badge = document.getElementById('domain-' + i);
+          if (badge) {
+            badge.className = 'domain-badge ' + (item.available ? 'available' : 'taken');
+            badge.textContent = item.available ? '✅ .com Available' : '❌ .com Taken';
+          }
+        });
+      } catch {
+        // Silently fail - domain check is optional
+        for (let i = 0; i < names.length; i++) {
+          const badge = document.getElementById('domain-' + i);
+          if (badge) { badge.className = 'domain-badge'; badge.textContent = ''; }
+        }
+      }
+    }
+
+    async function checkSelectedNames() {
+      if (generatedNames.length === 0) return;
+      showLoading('Rechecking domains...');
+      await autoCheckDomains(generatedNames);
+      hideLoading();
+    }
+
+    async function regenerateBrandNames() {
+      const fb = document.getElementById('brandnames-feedback-input').value;
+      document.getElementById('brandnames-feedback-input').value = '';
+      brandState.name = null;
+      document.getElementById('brandnames-preview').textContent = 'None';
+      document.getElementById('brandnames-next').disabled = true;
+      document.getElementById('check-domains-btn').style.display = 'none';
+      await generateBrandNames(fb);
+    }
+
+    // ─── TAGLINES ───
+    async function generateTaglines(feedback = '') {
+      showLoading('Generating taglines...');
+      try {
+        const r = await fetch(API + '/api/generate-tagline', {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':currentUser},
+          body:JSON.stringify({ retry: !!feedback, feedback: feedback || undefined, language: currentLang })
+        });
+        const d = await r.json();
+        if (d.error) { showAlert(d.error); }
+        else { renderTaglines(d.taglines || []); }
+      } catch { showAlert('Failed to generate taglines. Please try again.'); }
+      hideLoading();
+    }
+
+    function renderTaglines(taglines) {
+      const g = document.getElementById('taglines-grid');
+      g.innerHTML = '';
+      taglines.forEach((t, i) => {
+        const c = document.createElement('div');
+        c.className = 'card';
+        const optionLabel = getTranslation(currentLang, 'labels.option') || 'Option';
+        c.innerHTML = `
+          <div class="selected-badge">✓ Selected</div>
+          <div class="card-number">${optionLabel} ${String(i + 1).padStart(2, '0')}</div>
+          <div class="card-text">"${t}"</div>`;
+        c.onclick = () => {
+          document.querySelectorAll('#taglines-grid .card').forEach(x => x.classList.remove('selected'));
+          c.classList.add('selected');
+          brandState.tagline = t;
+          document.getElementById('taglines-preview').textContent = t;
+          document.getElementById('taglines-next').disabled = false;
+        };
+        g.appendChild(c);
+      });
+      translatePage(currentLang);
+    }
+
+    async function regenerateTaglines() {
+      const fb = document.getElementById('taglines-feedback-input').value;
+      document.getElementById('taglines-feedback-input').value = '';
+      brandState.tagline = null;
+      document.getElementById('taglines-preview').textContent = 'None';
+      document.getElementById('taglines-next').disabled = true;
+      await generateTaglines(fb);
+    }
+
+    // ─── LOGO STYLES ───
+    async function generateLogoStyles(feedback = '') {
+      showLoading('Generating logo style concepts...');
+      try {
+        const r = await fetch(API + '/api/generate-logo', {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':currentUser},
+          body:JSON.stringify({ retry: !!feedback, feedback: feedback || undefined, language: currentLang })
+        });
+        const d = await r.json();
+        if (d.error) { showAlert(d.error); }
+        else { logoStyles = d.logos || []; renderLogoStyles(logoStyles); }
+      } catch { showAlert('Failed to generate logo styles.'); }
+      hideLoading();
+    }
+
+    function renderLogoStyles(styles) {
+      const g = document.getElementById('logo-style-grid');
+      g.innerHTML = '';
+      const styleEmojis = { Minimal: '⬜', Bold: '🔷', Elegant: '✨' };
+      styles.forEach((s, i) => {
+        const c = document.createElement('div');
+        c.className = 'card';
+        const optionLabel = getTranslation(currentLang, 'labels.option') || 'Option';
+        c.innerHTML = `
+          <div class="selected-badge">✓ Selected</div>
+          <div class="card-number">${optionLabel} ${String(i + 1).padStart(2, '0')}</div>
+          <div style="font-size:2rem;margin-bottom:10px;">${styleEmojis[s.style] || '🎨'}</div>
+          <div class="card-title">${s.style}</div>
+          <div class="card-prompt">${s.prompt.substring(0, 120)}...</div>`;
+        c.onclick = () => {
+          document.querySelectorAll('#logo-style-grid .card').forEach(x => x.classList.remove('selected'));
+          c.classList.add('selected');
+          brandState.logo.style = s.style;
+          brandState.logo.prompt = s.prompt;
+          document.getElementById('logo-style-preview').textContent = s.style;
+          document.getElementById('logo-style-next').disabled = false;
+        };
+        g.appendChild(c);
+      });
+      translatePage(currentLang);
+    }
+
+    async function regenerateLogoStyles() {
+      const fb = document.getElementById('logo-style-feedback-input').value;
+      document.getElementById('logo-style-feedback-input').value = '';
+      brandState.logo.style = null; brandState.logo.prompt = null;
+      document.getElementById('logo-style-preview').textContent = 'None';
+      document.getElementById('logo-style-next').disabled = true;
+      await generateLogoStyles(fb);
+    }
+
+    async function generateSelectedLogo() {
+      if (!brandState.logo.prompt) { showAlert('Please select a logo style first'); return; }
+      showLoading('Generating your logo with AI...');
+      try {
+        const r = await fetch(API + '/api/generate-logo', {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':currentUser},
+          body:JSON.stringify({
+            retry: true,
+            brand_name: brandState.name,
+            feedback: `Generate the ${brandState.logo.style} style logo for brand "${brandState.name}": ${brandState.logo.prompt}`,
+            language: currentLang
+          })
+        });
+        const d = await r.json();
+        if (d.error) { showAlert(d.error); }
+        else {
+          if (d.logos && d.logos[0]) brandState.logo.image = d.logos[0].image;
+          document.getElementById('generated-logo-style').textContent = brandState.logo.style;
+          document.getElementById('generated-logo-prompt').textContent = brandState.logo.prompt;
+          if (brandState.logo.image) {
+            document.getElementById('generated-logo-img').src = 'data:image/png;base64,' + brandState.logo.image;
+            document.getElementById('generated-logo-img').style.display = 'block';
+            document.getElementById('generated-logo-placeholder').style.display = 'none';
+          }
+          showSection('logo-result');
+        }
+      } catch { showAlert('Failed to generate logo.'); }
+      hideLoading();
+    }
+
+    // ─── COLORS ───
+    async function generateColors(feedback = '') {
+      showLoading('Generating color palettes...');
+      try {
+        const r = await fetch(API + '/api/get-colors-from-session', {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':currentUser},
+          body:JSON.stringify({ retry: !!feedback, feedback: feedback || undefined, language: currentLang })
+        });
+        const d = await r.json();
+        if (d.error) { showAlert(d.error); }
+        else {
+          // Use the API's generated colors as the primary palette, create 2 alternatives
+          const primary = d.hex_codes && d.hex_codes.length >= 5 ? d.hex_codes : ['#7c3aed','#3b82f6','#10b981','#f59e0b','#ef4444'];
+          const palettes = [
+            { name: 'AI Generated', colors: primary, description: 'Tailored to your brand' },
+            { name: 'Dark & Bold', colors: ['#0f0f23','#1a1a3e','#7c3aed','#a78bfa','#f0f0ff'], description: 'Professional and strong' },
+            { name: 'Fresh & Light', colors: ['#ecfdf5','#d1fae5','#10b981','#065f46','#022c22'], description: 'Clean and natural' }
+          ];
+          renderColors(palettes);
+        }
+      } catch { showAlert('Failed to generate colors.'); }
+      hideLoading();
+    }
+
+    function renderColors(palettes) {
+      const g = document.getElementById('colors-grid');
+      g.innerHTML = '';
+      palettes.forEach((p, i) => {
+        const swatches = p.colors.map(c =>
+          `<div class="swatch swatch-small" style="background:${c}" title="${c}"></div>`
+        ).join('');
+        const hexList = p.colors.map(c =>
+          `<span style="font-size:0.7rem;color:var(--muted);font-family:monospace">${c}</span>`
+        ).join(' ');
+        const optionLabel = getTranslation(currentLang, 'labels.option') || 'Option';
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="selected-badge">✓ Selected</div>
+          <div class="card-number">${optionLabel} ${String(i + 1).padStart(2, '0')}</div>
+          <div class="card-title">${p.name}</div>
+          <div class="color-swatches">${swatches}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">${hexList}</div>
+          ${p.description ? `<div style="font-size:0.8rem;color:var(--muted);margin-top:8px;">${p.description}</div>` : ''}`;
+        card.onclick = () => {
+          document.querySelectorAll('#colors-grid .card').forEach(x => x.classList.remove('selected'));
+          card.classList.add('selected');
+          brandState.colors = p;
+          document.getElementById('colors-preview').textContent = p.name;
+          document.getElementById('colors-next').disabled = false;
+        };
+        g.appendChild(card);
+      });
+      translatePage(currentLang);
+    }
+
+    async function regenerateColors() {
+      const fb = document.getElementById('colors-feedback-input').value;
+      document.getElementById('colors-feedback-input').value = '';
+      brandState.colors = null;
+      document.getElementById('colors-preview').textContent = 'None';
+      document.getElementById('colors-next').disabled = true;
+      await generateColors(fb);
+    }
+
+    // ─── NEXT STEP FLOW ───
+    function nextStep() {
+      if (brandState.mode === 'full') {
+        if (currentSection === 'brandnames') { showSection('taglines'); generateTaglines(); }
+        else if (currentSection === 'taglines') { showSection('logo-style'); generateLogoStyles(); }
+        else if (currentSection === 'logo-result') { showSection('colors'); generateColors(); }
+        else if (currentSection === 'colors') { showFinal(); }
+      } else {
+        showFinal();
+      }
+    }
+
+    // ─── FINAL ───
+    function showFinal() {
+      document.getElementById('final-brandname').textContent = brandState.name || '—';
+      document.getElementById('final-tagline').textContent = brandState.tagline || '—';
+      document.getElementById('final-logo').textContent = brandState.logo?.style || '—';
+      const cd = document.getElementById('final-colors-display');
+      cd.innerHTML = '';
+      if (brandState.colors?.colors) {
+        brandState.colors.colors.forEach(c => {
+          const s = document.createElement('div');
+          s.className = 'swatch swatch-small';
+          s.style.cssText = `background:${c};display:inline-block;margin:0 4px 4px 0`;
+          s.title = c;
+          cd.appendChild(s);
+        });
+        cd.insertAdjacentHTML('beforeend', `<span style="font-size:0.85rem;color:var(--muted);margin-left:6px;">${brandState.colors.name}</span>`);
+      }
+      if (brandState.mode === 'full') {
+        document.getElementById('website-generator').classList.remove('hidden');
+        document.getElementById('download-options').classList.add('hidden');
+      } else {
+        document.getElementById('website-generator').classList.add('hidden');
+        document.getElementById('download-options').classList.remove('hidden');
+      }
+      showSection('final');
+      translatePage(currentLang);
+    }
+
+    // ─── WEBSITE GENERATION ───
+    async function generateWebsite() {
+      showLoading('Building your website...');
+      const btn = document.getElementById('generate-website-btn');
+      btn.disabled = true;
+      try {
+        const r = await fetch(API + '/generate-website', {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':currentUser},
+          body:JSON.stringify({
+            brand_name: brandState.name,
+            tagline: brandState.tagline,
+            colors: brandState.colors?.colors,
+            logo_style: brandState.logo?.style,
+            language: currentLang
+          })
+        });
+        const html = await r.text();
+        if (html.includes('No active brand session') || html.includes('Session not found')) {
+          showAlert('Session expired. Please login again.');
+          hideLoading(); btn.disabled = false;
+          return;
+        }
+        document.getElementById('website-iframe').srcdoc = html;
+        document.getElementById('download-link').href = URL.createObjectURL(new Blob([html], { type:'text/html' }));
+        document.getElementById('website-preview').classList.remove('hidden');
+      } catch { showAlert('Failed to generate website.'); }
+      hideLoading(); btn.disabled = false;
+    }
+
+    function downloadJSON() {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(brandState, null, 2)], { type:'application/json' }));
+      a.download = 'bizforge-brand-kit.json';
+      a.click();
+    }
+
+    // ─── CHATBOT ───
+    let chatOpen = false, chatBusy = false;
+
+    function toggleChat() {
+      chatOpen = !chatOpen;
+      const fab = document.getElementById('chat-fab');
+      document.getElementById('chat-window').classList.toggle('open', chatOpen);
+      fab.textContent = chatOpen ? '✕' : '💬';
+      fab.classList.toggle('open', chatOpen);
+      if (chatOpen) { document.getElementById('chat-input').focus(); hideSuggestions(); }
+    }
+
+    function hideSuggestions() {
+      const s = document.getElementById('chat-suggestions');
+      if (s.querySelectorAll('.chat-msg').length > 1 || document.getElementById('chat-messages').children.length > 1) {
+        // keep suggestions visible until first real message
+      }
+    }
+
+    function sendSuggestion(btn) {
+      document.getElementById('chat-input').value = btn.textContent;
+      document.getElementById('chat-suggestions').style.display = 'none';
+      sendChat();
+    }
+
+    document.getElementById('chat-input').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); sendChat(); }
+    });
+
+    async function sendChat() {
+      const inp = document.getElementById('chat-input');
+      const msg = inp.value.trim();
+      if (!msg || chatBusy) return;
+      inp.value = '';
+      chatBusy = true;
+      document.getElementById('chat-send-btn').disabled = true;
+      document.getElementById('chat-suggestions').style.display = 'none';
+
+      appendChat(msg, 'user');
+
+      const typing = document.createElement('div');
+      typing.className = 'chat-msg bot typing';
+      typing.innerHTML = '<span></span><span></span><span></span>';
+      document.getElementById('chat-messages').appendChild(typing);
+      scrollChat();
+
+      try {
+        let response;
+
+        if (currentUser) {
+          // Use context-aware chat when logged in
+          const r = await fetch(API + '/api/chat-with-context', {
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':currentUser},
+            body:JSON.stringify({ message: msg, language: currentLang })
+          });
+          const d = await r.json();
+          response = d.response || d.message || d.error || 'Sorry, I had trouble responding.';
+          if (d.error && d.error.includes('session')) {
+            // Fallback to generic chat if no brand session yet
+            const r2 = await fetch(API + '/api/chat', {
+              method:'POST',
+              headers:{'Content-Type':'application/json'},
+              body:JSON.stringify({ user_message: msg, language: currentLang })
+            });
+            const d2 = await r2.json();
+            response = d2.response || d2.message || 'Sorry, I had trouble responding.';
+          }
+        } else {
+          // Generic chat for non-logged-in users
+          const r = await fetch(API + '/api/chat', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ user_message: msg, language: currentLang })
+          });
+          const d = await r.json();
+          response = d.response || d.message || 'Sorry, I had trouble responding.';
+        }
+
+        typing.remove();
+        appendChat(response, 'bot');
+      } catch (err) {
+        typing.remove();
+        appendChat('Connection error. Please check that the backend server is running.', 'bot');
+      }
+
+      chatBusy = false;
+      document.getElementById('chat-send-btn').disabled = false;
+    }
+
+    function appendChat(text, role) {
+      const el = document.createElement('div');
+      el.className = 'chat-msg ' + role;
+      el.textContent = text;
+      document.getElementById('chat-messages').appendChild(el);
+      scrollChat();
+    }
+
+    function scrollChat() {
+      const m = document.getElementById('chat-messages');
+      m.scrollTop = m.scrollHeight;
+    }
+
+    // ─── INIT ───
+    window.addEventListener('load', () => {
+      // Restore theme
+      if (localStorage.getItem('bf_theme') === 'light') {
+        document.body.classList.add('light-mode');
+        document.getElementById('theme-toggle').textContent = '🌙';
+      }
+      // Restore language
+      const saved = localStorage.getItem('bf_lang') || 'en';
+      document.getElementById('lang-selector').value = saved;
+      setLanguage(saved);
+
+      // Restore auth
+      const savedAuth = localStorage.getItem('bf_auth');
+      if (savedAuth) {
+        const [username] = savedAuth.split(':');
+        currentUser = savedAuth;
+        document.getElementById('nav-username').textContent = username;
+        document.getElementById('nav-username').style.display = 'inline';
+        document.getElementById('logout-btn').style.display = 'inline-flex';
+        goToApp('mode');
+      }
+    });
+
+    // Language selector listener
+    document.getElementById('lang-selector').addEventListener('change', function() {
+      setLanguage(this.value);
+    });
+
+    // Enter key listeners for auth
+    document.getElementById('login-username').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); handleLogin(); } });
+    document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); handleLogin(); } });
+    document.getElementById('manual-brand-name').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); proceedToIntake(); } });
+    document.getElementById('domain-check-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); checkDomains(); } });
+    document.getElementById('competitor-url').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); analyzeCompetitor(); } });
+
+    // ==================== VOICE / SPEECH TO TEXT ====================
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let activeMicBtn = null;
+    let activeMicTargetId = null;
+
+    async function startMic(targetInputId, btn) {
+      // If already recording, stop
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioChunks = [];
+        activeMicBtn = btn;
+        activeMicTargetId = targetInputId;
+
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg';
+        mediaRecorder = new MediaRecorder(stream, { mimeType });
+
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+
+        mediaRecorder.onstop = async () => {
+          stream.getTracks().forEach(t => t.stop());
+          btn.classList.remove('recording');
+          btn.innerHTML = '🎤';
+          btn.classList.add('loading');
+          const blob = new Blob(audioChunks, { type: mimeType });
+          const fd = new FormData();
+          fd.append('audio', blob, 'voice.' + (mimeType === 'audio/webm' ? 'webm' : 'ogg'));
+          try {
+            const r = await fetch(API + '/api/transcribe', { method: 'POST', body: fd });
+            const d = await r.json();
+            const text = d.text || d.transcript || '';
+            if (text) {
+              const el = document.getElementById(targetInputId);
+              if (el) {
+                if (el.tagName === 'TEXTAREA') {
+                  el.value = (el.value ? el.value + ' ' : '') + text;
+                  el.dispatchEvent(new Event('input'));
+                } else {
+                  el.value = text;
+                }
+              }
+            } else {
+              showAlert('Could not transcribe audio. Please try again.');
+            }
+          } catch {
+            showAlert('Transcription failed. Is the backend running?');
+          }
+          btn.classList.remove('loading');
+        };
+
+        mediaRecorder.start();
+        btn.classList.add('recording');
+        btn.innerHTML = '⏹';
+        // Auto-stop after 15 seconds
+        setTimeout(() => { if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop(); }, 15000);
+      } catch (err) {
+        if (err.name === 'NotAllowedError') showAlert('Microphone permission denied. Please allow microphone access.');
+        else showAlert('Microphone not available: ' + err.message);
+      }
+    }
+
+    // ==================== SENTIMENT ANALYSIS ====================
+    async function analyzeSentiment() {
+      const text = document.getElementById('sentiment-input').value.trim();
+      if (!text || text.length < 5) { showAlert('Please enter some text to analyze'); return; }
+      showLoading('Analyzing sentiment...');
+      const resultEl = document.getElementById('sentiment-result');
+      resultEl.classList.remove('show');
+      try {
+        const r = await fetch(API + '/api/analyze-sentiment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, language: currentLang })
+        });
+        const d = await r.json();
+        if (d.error) { showAlert(d.error); hideLoading(); return; }
+
+        // Parse the response - backend may return different structures
+        const sentiment = d.sentiment || d.label || 'neutral';
+        const score = d.score || d.confidence || d.confidence_score || '';
+        const explanation = d.explanation || d.analysis || d.details || d.message || '';
+        const sl = sentiment.toLowerCase();
+        const emoji = sl.includes('positive') ? '😊' : sl.includes('negative') ? '😞' : '😐';
+        const scoreText = score ? ` <span class="sentiment-score">(${(parseFloat(score)*100||score).toFixed ? (parseFloat(score)*100).toFixed(0)+'%' : score} confidence)</span>` : '';
+
+        resultEl.innerHTML = `
+          <div class="sentiment-badge ${sl.includes('positive') ? 'positive' : sl.includes('negative') ? 'negative' : 'neutral'}">
+            ${emoji} ${sentiment.charAt(0).toUpperCase() + sentiment.slice(1).toLowerCase()}${scoreText}
+          </div>
+          <div style="color:var(--muted);font-size:0.88rem;line-height:1.7;">${explanation || 'Analysis complete.'}</div>
+          <div class="result-actions">
+            <button type="button" class="btn-copy" onclick="copyResultText(\`${(explanation||sentiment).replace(/`/g,"'").replace(/\\/g,'')}\`)">📋 Copy Analysis</button>
+          </div>`;
+        resultEl.classList.add('show');
+      } catch { showAlert('Sentiment analysis failed. Is the backend running?'); }
+      hideLoading();
+    }
+
+    // ==================== PRODUCT DESCRIPTION ====================
+    async function generateProductDesc() {
+      const productName = document.getElementById('product-name-input').value.trim();
+      const desc = document.getElementById('product-desc-input').value.trim();
+      const audience = document.getElementById('product-audience-input').value.trim();
+      if (!productName || !desc) { showAlert('Please enter both a product name and description'); return; }
+      showLoading('Generating product description...');
+      const resultEl = document.getElementById('product-desc-result');
+      resultEl.classList.remove('show');
+      try {
+        const payload = {
+          product_name: productName,
+          product_info: desc,
+          target_audience: audience || undefined,
+          brand_name: brandState.name || undefined,
+          tone: brandState.tone || undefined,
+          language: currentLang
+        };
+        const r = await fetch(API + '/api/generate-product-description', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': currentUser || '' },
+          body: JSON.stringify(payload)
+        });
+        const d = await r.json();
+        if (d.error) { showAlert(d.error); hideLoading(); return; }
+        const text = d.description || d.product_description || d.content || d.text || JSON.stringify(d);
+        const safeText = text.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        resultEl.innerHTML = `<div style="white-space:pre-wrap;line-height:1.75;">${safeText}</div>
+          <div class="result-actions">
+            <button type="button" class="btn-copy" onclick="copyResultText(document.getElementById('product-desc-result').querySelector('div').textContent)">📋 Copy Description</button>
+          </div>`;
+        resultEl.classList.add('show');
+      } catch { showAlert('Failed to generate description. Is the backend running?'); }
+      hideLoading();
+    }
+
+    // ==================== SOCIAL POST ====================
+    let selectedPlatform = 'Instagram';
+    let selectedSocialTone = '';
+
+    function selectPlatform(el, platform) {
+      document.querySelectorAll('.platform-grid .platform-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedPlatform = platform;
+    }
+
+    function selectSocialTone(el, tone) {
+      document.querySelectorAll('#social-tone-grid .option-card').forEach(c => c.classList.remove('selected'));
+      if (selectedSocialTone === tone) { selectedSocialTone = ''; return; }
+      el.classList.add('selected');
+      selectedSocialTone = tone;
+    }
+
+    async function generateSocialPost() {
+      const topic = document.getElementById('social-topic-input').value.trim();
+      if (!topic || topic.length < 5) { showAlert('Please describe what you want to post about'); return; }
+      showLoading('Generating social post...');
+      const resultEl = document.getElementById('social-post-result');
+      resultEl.classList.remove('show');
+      try {
+        const payload = {
+          topic,
+          platform: selectedPlatform,
+          tone: selectedSocialTone || brandState.tone || undefined,
+          brand_name: brandState.name || undefined,
+          language: currentLang
+        };
+        const r = await fetch(API + '/api/generate-social-post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': currentUser || '' },
+          body: JSON.stringify(payload)
+        });
+        const d = await r.json();
+        if (d.error) { showAlert(d.error); hideLoading(); return; }
+        const text = d.post || d.social_post || d.content || d.text || JSON.stringify(d);
+        const safeText = text.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        resultEl.innerHTML = `
+          <div style="margin-bottom:10px;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);">📱 ${selectedPlatform} Post</div>
+          <div style="white-space:pre-wrap;line-height:1.8;">${safeText}</div>
+          <div class="result-actions">
+            <button type="button" class="btn-copy" onclick="copyResultText(document.getElementById('social-post-result').querySelector('div:nth-child(2)').textContent)">📋 Copy Post</button>
+          </div>`;
+        resultEl.classList.add('show');
+      } catch { showAlert('Failed to generate post. Is the backend running?'); }
+      hideLoading();
+    }
+
+    // ==================== EMAIL GENERATOR ====================
+    let selectedEmailType = 'Welcome Email';
+
+    function selectEmailType(el, type) {
+      document.querySelectorAll('.email-type-grid .platform-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedEmailType = type;
+    }
+
+    async function generateEmail() {
+      const topic = document.getElementById('email-topic-input').value.trim();
+      if (!topic || topic.length < 5) { showAlert('Please describe what the email should be about'); return; }
+      showLoading('Generating email...');
+      const resultEl = document.getElementById('email-gen-result');
+      resultEl.classList.remove('show');
+      try {
+        const payload = {
+          topic,
+          email_type: selectedEmailType,
+          recipient: document.getElementById('email-recipient-input').value.trim() || undefined,
+          brand_name: brandState.name || undefined,
+          tone: brandState.tone || undefined,
+          language: currentLang
+        };
+        const r = await fetch(API + '/api/generate-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': currentUser || '' },
+          body: JSON.stringify(payload)
+        });
+        const d = await r.json();
+        if (d.error) { showAlert(d.error); hideLoading(); return; }
+        const text = d.email || d.email_content || d.content || d.text || JSON.stringify(d);
+        const safeText = text.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        resultEl.innerHTML = `
+          <div style="margin-bottom:10px;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);">✉️ ${selectedEmailType}</div>
+          <div style="white-space:pre-wrap;line-height:1.8;font-family:monospace;font-size:0.85rem;">${safeText}</div>
+          <div class="result-actions">
+            <button type="button" class="btn-copy" onclick="copyResultText(document.getElementById('email-gen-result').querySelector('div:nth-child(2)').textContent)">📋 Copy Email</button>
+          </div>`;
+        resultEl.classList.add('show');
+      } catch { showAlert('Failed to generate email. Is the backend running?'); }
+      hideLoading();
+    }
+
+    // ==================== COPY HELPERS ====================
+    function copyResult(resultBoxId) {
+      const el = document.getElementById(resultBoxId);
+      const text = el ? el.innerText : '';
+      copyResultText(text);
+    }
+
+    function copyResultText(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showAlert('Copied to clipboard!', 'success');
+      }).catch(() => {
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+        showAlert('Copied!', 'success');
+      });
+    }
+
+  </script>
+</body>
+</html>
